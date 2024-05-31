@@ -1,6 +1,7 @@
 import { InvalidDataError } from "../utils/err";
 import { IAPIResponse, validationFunction } from "../interfaces/interfaces";
 import { Request, Response, NextFunction } from "express";
+import createResponse from "../utils/response";
 
 export default class ValidationMiddleware {
 
@@ -30,11 +31,7 @@ export default class ValidationMiddleware {
         } catch (err: any) {
             
             if (err instanceof Error) {
-                const response: IAPIResponse<null> = {
-                    success: false,
-                    data: null,
-                    error: 'Internal server error.'
-                };
+                const response:IAPIResponse<null> = createResponse(false, null, 'Internal server erro.');
                 
                 if (err instanceof InvalidDataError) {
                     response.error = err.errorMessage;

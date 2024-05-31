@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const err_1 = require("../utils/err");
+const response_1 = __importDefault(require("../utils/response"));
 class ValidationMiddleware {
     static validateRequest(req, res, next, validationFunctions) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,11 +33,7 @@ class ValidationMiddleware {
             }
             catch (err) {
                 if (err instanceof Error) {
-                    const response = {
-                        success: false,
-                        data: null,
-                        error: 'Internal server error.'
-                    };
+                    const response = (0, response_1.default)(false, null, 'Internal server erro.');
                     if (err instanceof err_1.InvalidDataError) {
                         response.error = err.errorMessage;
                         response.messages = err.messages;

@@ -10,4 +10,6 @@ const user_controller_1 = __importDefault(require("../controllers/user-controlle
 const userRouter = (0, express_1.Router)();
 // userRouter.get('/user', UserController.getUsers);
 userRouter.post('/user', user_middleware_1.default.validadeRequestBodyToCreateUser, user_controller_1.default.createNewUser);
+// userRouter.use(LoginMiddleware.Auth)
+//
 exports.default = userRouter;

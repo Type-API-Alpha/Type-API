@@ -31,11 +31,11 @@ class UserService {
         return __awaiter(this, void 0, void 0, function* () {
             const usernameUsed = yield user_repository_1.default.findUserByUsername(userInfos.username);
             if (usernameUsed) {
-                throw new err_1.ConflictError('service', 'Username already used.');
+                throw new err_1.ConflictError('Service layer', 'Username already used.');
             }
             const registeredEmail = yield user_repository_1.default.findUserByEmail(userInfos.email);
             if (registeredEmail) {
-                throw new err_1.ConflictError('service', 'Inválid Email.');
+                throw new err_1.ConflictError('Service layer', 'Inválid Email.');
             }
             const hashedPassword = yield (0, hash_password_1.createHashPassword)(userInfos.password);
             userInfos.password = hashedPassword;

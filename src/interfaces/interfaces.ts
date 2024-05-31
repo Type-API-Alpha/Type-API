@@ -2,7 +2,7 @@ export type uuid = string;
 export type email = string;
 export type typeName = 'name' | 'username' | 'firstName' | 'lastName';
 export type validationFunction = () => IValidationResponse;
-
+export type jwt = string;
 
 // interfaces de entidades
 export interface IUser {
@@ -39,10 +39,25 @@ export interface IValidationResponse {
     message: string | null;
 }
 
-
 export interface IAPIResponse<T> {
     success: boolean;
     data: T | null;
     error: null | string;
     messages?: Array<string> | string
+}
+
+export interface ILoginTokenPayload {
+    userID: uuid,
+    isAdmin: boolean
+}
+
+export interface ICookieOptions {
+    name: string,
+    val: jwt, 
+    options: {
+        maxAge: number, 
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true
+    }
 }

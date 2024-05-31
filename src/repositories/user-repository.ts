@@ -13,13 +13,13 @@ export default class UserRepository {
         return rows[0];
     }
 
-    static async findUserByUsername(username:string):Promise<IUser | void> {
+    static async findUserByUsername(username:string):Promise<IUser | null> {
         const query = 'SELECT * FROM "User" WHERE username = $1';
         const { rows } = await dBConnection.query(query, [ username ]);
         return rows[0];
     } 
 
-    static async findUserByEmail(email: email):Promise<IUser | void> {
+    static async findUserByEmail(email: email):Promise<IUser | null> {
         const query = 'SELECT * FROM "User" WHERE email = $1';
         const { rows } = await dBConnection.query(query, [ email ]);
         return rows[0] as IUser;

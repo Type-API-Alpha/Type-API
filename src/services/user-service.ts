@@ -9,12 +9,12 @@ export default class UserService {
 
         const usernameUsed = await UserRepository.findUserByUsername(userInfos.username as string);
         if (usernameUsed) {
-            throw new ConflictError('service', 'Username already used.');
+            throw new ConflictError('Service layer', 'Username already used.');
         }
 
         const registeredEmail = await UserRepository.findUserByEmail(userInfos.email as string);
         if (registeredEmail) {
-            throw new ConflictError('service', 'Inválid Email.');
+            throw new ConflictError('Service layer', 'Inválid Email.');
         }
 
         const hashedPassword = await createHashPassword(userInfos.password as string);

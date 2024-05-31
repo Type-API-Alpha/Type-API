@@ -7,7 +7,7 @@ export default class LoginMiddleware {
 
     static async validateBodyToLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
         const requestBodyValidator = new RequestBodyValidator();
-
+        
         const validationFunctions: Array<validationFunction> = [
             () => requestBodyValidator.validateUserEmail(req.body.email),
             () => requestBodyValidator.validateUserPassword(req.body.password)
