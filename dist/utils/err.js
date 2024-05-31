@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InvalidDataError = void 0;
+exports.ConflictError = exports.InvalidDataError = void 0;
 class InvalidDataError extends Error {
     constructor(layer, messages) {
         super();
@@ -12,3 +12,13 @@ class InvalidDataError extends Error {
     }
 }
 exports.InvalidDataError = InvalidDataError;
+class ConflictError extends Error {
+    constructor(layer, errorMessage) {
+        super();
+        this.name = this.constructor.name;
+        this.message = errorMessage;
+        this.code = 409;
+        this.layer = layer;
+    }
+}
+exports.ConflictError = ConflictError;

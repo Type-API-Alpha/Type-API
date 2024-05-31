@@ -16,6 +16,17 @@ export interface IUser {
     isAdmin: boolean
 }
 
+export interface IUserDatabase {
+    id?: uuid, 
+    username: string, 
+    email: email, 
+    first_name: string,
+    last_name: string, 
+    password: string, 
+    squad?: uuid, 
+    isAdmin?: boolean
+}
+
 export interface ITeam {
     id: uuid,
     name: string,
