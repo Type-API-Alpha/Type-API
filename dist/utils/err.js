@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConflictError = exports.InvalidDataError = void 0;
+exports.UnauthorizedError = exports.ConflictError = exports.InvalidDataError = void 0;
 class InvalidDataError extends Error {
     constructor(layer, messages) {
         super();
         this.name = this.constructor.name;
-        this.errorMessage = 'Inválid data';
+        this.errorMessage = 'Invalid data';
         this.messages = messages;
         this.code = 400;
         this.layer = layer;
@@ -22,3 +22,13 @@ class ConflictError extends Error {
     }
 }
 exports.ConflictError = ConflictError;
+class UnauthorizedError extends Error {
+    constructor(layer) {
+        super();
+        this.name = this.constructor.name;
+        this.errorMessage = 'Invalid email and/or password.';
+        this.code = 401;
+        this.layer = layer;
+    }
+}
+exports.UnauthorizedError = UnauthorizedError;
