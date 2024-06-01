@@ -24,7 +24,7 @@ export interface IUserDatabase {
     last_name: string, 
     password: string, 
     squad?: uuid, 
-    isAdmin?: boolean
+    is_admin?: boolean
 }
 
 export interface ITeam {

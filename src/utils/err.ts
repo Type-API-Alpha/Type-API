@@ -45,3 +45,11 @@ export class UnauthorizedError extends Error {
         this.layer = layer
     } 
 }
+
+export class UnauthorizedSessionError extends UnauthorizedError {
+
+    constructor(layer: string) {
+        super(layer)
+        this.errorMessage = 'Missing valid session cookie.'
+    }
+}

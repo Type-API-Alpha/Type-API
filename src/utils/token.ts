@@ -1,5 +1,5 @@
 import { ILoginTokenPayload } from "../interfaces/interfaces";
-import Jwt from "jsonwebtoken";
+import Jwt, { JwtPayload } from "jsonwebtoken";
 import { jwt } from "../interfaces/interfaces";
 import dotenv from "dotenv";
 
@@ -11,14 +11,18 @@ export const createToken = (payload:ILoginTokenPayload,  options: {expiresIn: st
     return token;
 }
 
-export const verifyToken = (token: jwt) => {
-    return Jwt.verify(token, tokenSecretKey, function(err, decoded) {
+export const verifyToken = (token: jwt):false | JwtPayload => {
+    let validationResult: false | JwtPayload = false;
+
+    Jwt.verify(token, tokenSecretKey, function(err, decoded): void {
         if (err) {
-            return false;
+            return;
         } else {
-            return decoded;
+            validationResult = decoded as JwtPayload;
         }
     })
+
+    return validationResult;
 }
 
 module.exports = {

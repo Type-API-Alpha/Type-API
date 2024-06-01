@@ -14,14 +14,16 @@ const createToken = (payload, options) => {
 };
 exports.createToken = createToken;
 const verifyToken = (token) => {
-    return jsonwebtoken_1.default.verify(token, tokenSecretKey, function (err, decoded) {
+    let validationResult = false;
+    jsonwebtoken_1.default.verify(token, tokenSecretKey, function (err, decoded) {
         if (err) {
-            return false;
+            return;
         }
         else {
-            return decoded;
+            validationResult = decoded;
         }
     });
+    return validationResult;
 };
 exports.verifyToken = verifyToken;
 module.exports = {

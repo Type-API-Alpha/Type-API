@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnauthorizedError = exports.ConflictError = exports.InvalidDataError = void 0;
+exports.UnauthorizedSessionError = exports.UnauthorizedError = exports.ConflictError = exports.InvalidDataError = void 0;
 class InvalidDataError extends Error {
     constructor(layer, messages) {
         super();
@@ -32,3 +32,10 @@ class UnauthorizedError extends Error {
     }
 }
 exports.UnauthorizedError = UnauthorizedError;
+class UnauthorizedSessionError extends UnauthorizedError {
+    constructor(layer) {
+        super(layer);
+        this.errorMessage = 'Missing valid session cookie.';
+    }
+}
+exports.UnauthorizedSessionError = UnauthorizedSessionError;
