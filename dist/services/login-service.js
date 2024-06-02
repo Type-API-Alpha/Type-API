@@ -33,12 +33,12 @@ class LoginService {
     static createSessionCookie(authenticatedUser) {
         const payload = {
             userID: authenticatedUser.id,
-            isAdmin: authenticatedUser.isAdmin
+            isAdmin: authenticatedUser.is_admin
         };
         const tokenOption = { expiresIn: '8h' };
         const sessionToken = (0, token_1.createToken)(payload, tokenOption);
         const cookieOptions = {
-            name: 'session_cookie',
+            name: 'session_token',
             val: sessionToken,
             options: {
                 maxAge: 8 * 60 * 60 * 1000,

@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export type uuid = string;
 export type email = string;
 export type typeName = 'name' | 'username' | 'firstName' | 'lastName';
@@ -24,7 +26,7 @@ export interface IUserDatabase {
     last_name: string, 
     password: string, 
     squad?: uuid, 
-    isAdmin?: boolean
+    is_admin?: boolean
 }
 
 export interface ITeam {
@@ -59,5 +61,11 @@ export interface ICookieOptions {
         httpOnly: true,
         sameSite: 'strict',
         secure: true
+    }
+}
+
+declare module 'express-serve-static-core' {
+    interface Request {
+        user?: ILoginTokenPayload;
     }
 }
