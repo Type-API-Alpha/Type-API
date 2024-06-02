@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { RequestBodyValidator } from "../utils/validations";
-import { validationFunction, IAPIResponse, ILoginTokenPayload, jwt } from "../interfaces/interfaces";
+import { validationFunction, IAPIResponse, jwt } from "../interfaces/interfaces";
 import ValidationMiddleware from ".";
 import { UnauthorizedError, UnauthorizedSessionError } from "../utils/err";
 import createResponse from "../utils/response";
@@ -31,13 +31,11 @@ export default class LoginMiddleware {
             const tokenDecoded = verifyToken(sessionToken);
             
             if (!tokenDecoded) {
-                throw new UnauthorizedSessionError('Middleware layer(login)');
-                
+                throw new UnauthorizedSessionError('Middleware layer(login)');   
             }
 
-            // Fazer uma declaração de tipo para adicionar a propriedade req.user;
-            // const { userID, isAdmin } = tokenDecoded; 
-            // req.user = {userID, isAdmin}
+            const { userID, isAdmin } = tokenDecoded; 
+            req.user = {userID, isAdmin};
             
             next();
         } catch (err) {

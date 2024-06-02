@@ -39,14 +39,20 @@ class LoginMiddleware {
                 if (!tokenDecoded) {
                     throw new err_1.UnauthorizedSessionError('Middleware layer(login)');
                 }
-                console.log(tokenDecoded);
+                // Fazer uma declaração de tipo para adicionar a propriedade req.user;
+                const { userID, isAdmin } = tokenDecoded;
+                req.user = { userID, isAdmin };
+                console.log(req.user);
                 next();
             }
             catch (err) {
+                const response = (0, response_1.default)(true, null, 'Internal server error.');
                 if (err instanceof err_1.UnauthorizedError) {
-                    console.log(err);
-                    const response = (0, response_1.default)(true, null, err.errorMessage);
+                    response.error = err.errorMessage;
                     res.status(err.code).json(response);
+                }
+                else {
+                    res.status(500).json(response);
                 }
             }
         });
