@@ -59,7 +59,7 @@ export class RequestBodyValidator {
         );
     }
 
-    public validateUUID(ID: uuid): IValidationResponse {
+    public validateUUID(ID: uuid, entityName: string): IValidationResponse {
         const response: IValidationResponse = {
             isValid: true,
             message: null
@@ -67,7 +67,7 @@ export class RequestBodyValidator {
 
         if (ID && !uuidValidate(ID)) {
             response.isValid = false;
-            response.message = 'Inválid ID. ID must be UUUID type.';
+            response.message = `Inválid ID. ${entityName} ID must be UUUID type.`;
             return response;
         }
 

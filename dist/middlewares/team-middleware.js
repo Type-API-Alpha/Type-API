@@ -20,8 +20,20 @@ class TeamMiddleware {
             const requestBodyValidator = new validations_1.RequestBodyValidator();
             const teamInfos = req.body;
             const validationFunctions = [
-                () => requestBodyValidator.validateName('name', teamInfos.name),
-                () => requestBodyValidator.validateUUID(teamInfos.leader),
+                () => requestBodyValidator.validateName('team name', teamInfos.name),
+                () => requestBodyValidator.validateUUID(teamInfos.leader, 'Leader'),
+            ];
+            yield _1.default.validateRequest(req, res, next, validationFunctions);
+        });
+    }
+    static validateIDsTypeToAddNewMembers(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const requestBodyValidator = new validations_1.RequestBodyValidator();
+            const teamID = req.params.team_id;
+            const userID = req.params.user_id;
+            const validationFunctions = [
+                () => requestBodyValidator.validateUUID(teamID, 'Team'),
+                () => requestBodyValidator.validateUUID(userID, 'User'),
             ];
             yield _1.default.validateRequest(req, res, next, validationFunctions);
         });
