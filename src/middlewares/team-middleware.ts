@@ -10,7 +10,7 @@ export default class TeamMiddleware {
         const teamInfos:ITeam = req.body;
 
         const validationFunctions: Array<validationFunction> = [
-            () => requestBodyValidator.validateName('name', teamInfos.name),
+            () => requestBodyValidator.validateName('team name', teamInfos.name),
             () => requestBodyValidator.validateUUID( teamInfos.leader),
         ];
         

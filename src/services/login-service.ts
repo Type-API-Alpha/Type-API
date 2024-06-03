@@ -1,4 +1,4 @@
-import { ICookieOptions, ILoginTokenPayload, IUser, email } from "../interfaces/interfaces";
+import { ICookieOptions, ILoginTokenPayload, IUser, IUserDatabase, email } from "../interfaces/interfaces";
 import UserRepository from "../repositories/user-repository";
 import { UnauthorizedError } from "../utils/err";
 import { comparePassword } from "../utils/hash-password";
@@ -23,17 +23,17 @@ export default class LoginService {
         return registeredUser;
     }
 
-    static createSessionCookie(authenticatedUser: IUser): ICookieOptions {
+    static createSessionCookie(authenticatedUser: Partial<IUserDatabase>): ICookieOptions {
 
         const payload:ILoginTokenPayload = {
-            userID: authenticatedUser.id,
-            isAdmin: authenticatedUser.isAdmin
-        }
+            userID: authenticatedUser.id as string,
+            isAdmin: authenticatedUser.is_admin as boolean
+        }   
         const tokenOption = { expiresIn: '8h'};
         const sessionToken = createToken(payload, tokenOption);
 
         const cookieOptions:ICookieOptions = {
-            name: 'session_cookie',
+            name: 'session_token',
             val: sessionToken,
             options: {
                 maxAge: 8 * 60 * 60 * 1000, 
