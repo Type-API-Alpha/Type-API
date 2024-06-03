@@ -24,7 +24,7 @@ class UserController {
                 res.status(201).json(response);
             }
             catch (err) {
-                const response = (0, response_1.default)(false, null, 'Internal server error.');
+                const response = (0, response_1.default)(false, null, "Internal server error.");
                 if (err instanceof err_1.ConflictError) {
                     response.error = err.message;
                     res.status(err.code).json(response);
@@ -32,6 +32,22 @@ class UserController {
                 else {
                     res.status(500).json(response);
                 }
+            }
+        });
+    }
+    static getAllUsers(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const users = (_a = (yield user_service_1.default.getAllUsers())) !== null && _a !== void 0 ? _a : [
+                    "No data available",
+                ];
+                const response = (0, response_1.default)(true, users, null);
+                res.status(200).json(response);
+            }
+            catch (error) {
+                const response = (0, response_1.default)(false, null, "Internal server error");
+                res.status(500).json(response);
             }
         });
     }

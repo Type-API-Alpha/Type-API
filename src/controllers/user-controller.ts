@@ -5,21 +5,45 @@ import UserService from "../services/user-service";
 import createResponse from "../utils/response";
 
 export default class UserController {
+	static async createNewUser(req: Request, res: Response): Promise<void> {
+		try {
+			const user = await UserService.createUser(req.body);
+			const response: IAPIResponse<Partial<IUser>> = createResponse(
+				true,
+				user,
+				null
+			);
+			res.status(201).json(response);
+		} catch (err: any) {
+			const response: IAPIResponse<null> = createResponse(
+				false,
+				null,
+				"Internal server error."
+			);
 
-    static async createNewUser(req: Request, res: Response):Promise<void> {
-        try {
-            const user = await UserService.createUser(req.body);
-            const response: IAPIResponse<Partial<IUser>> = createResponse(true, user, null);
-            res.status(201).json(response);
-        } catch (err: any) {
-            const response:IAPIResponse<null> = createResponse(false, null, 'Internal server error.');
+			if (err instanceof ConflictError) {
+				response.error = err.message;
+				res.status(err.code).json(response);
+			} else {
+				res.status(500).json(response);
+			}
+		}
+	}
 
-            if (err instanceof ConflictError) {
-                response.error = err.message;
-                res.status(err.code).json(response);
-            } else {
-                res.status(500).json(response);
-            }  
-        }
-    }
+	static async getAllUsers(req: Request, res: Response): Promise<void> {
+		try {
+			const users = (await UserService.getAllUsers()) ?? [
+				"No data available",
+			];
+			const response = createResponse(true, users, null);
+			res.status(200).json(response);
+		} catch (error) {
+			const response = createResponse(
+				false,
+				null,
+				"Internal server error"
+			);
+			res.status(500).json(response);
+		}
+	}
 }

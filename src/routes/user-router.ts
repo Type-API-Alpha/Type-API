@@ -10,6 +10,7 @@ const userRouter: Router = Router();
 // userRouter.get('/user', UserController.getUsers);
 userRouter.post('/user', UserMiddleware.validadeRequestBodyToCreateUser, UserController.createNewUser);
 userRouter.use(LoginMiddleware.authorization);
+userRouter.get("/users", UserController.getAllUsers);
 
 
 export default userRouter;

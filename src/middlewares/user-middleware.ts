@@ -28,7 +28,7 @@ export default class UserMiddleware {
             const isAdmin = loggedUser.isAdmin === true;
             
             if (!isAdmin) {
-                throw new ForbiddenAccessError('Middlware layer');
+                throw new ForbiddenAccessError('Middleware layer');
             }
 
             next();

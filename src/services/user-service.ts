@@ -33,4 +33,9 @@ export default class UserService {
 
         return userWithoutPass;
     }
+
+	static async getAllUsers(): Promise<Partial<IUser[]>> {
+		const users = await UserRepository.getAllUsers();
+		return users;
+	}
 }

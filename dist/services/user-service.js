@@ -50,5 +50,11 @@ class UserService {
             return userWithoutPass;
         });
     }
+    static getAllUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const users = yield user_repository_1.default.getAllUsers();
+            return users;
+        });
+    }
 }
 exports.default = UserService;
