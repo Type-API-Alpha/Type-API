@@ -10,9 +10,11 @@ export default class UserController {
         try {
             const user = await UserService.createUser(req.body);
             const response: IAPIResponse<Partial<IUser>> = createResponse(true, user, null);
+            console.log(response);
             res.status(201).json(response);
         } catch (err: any) {
             const response:IAPIResponse<null> = createResponse(false, null, 'Internal server error.');
+            console.log(err);
 
             if (err instanceof ConflictError) {
                 response.error = err.message;
