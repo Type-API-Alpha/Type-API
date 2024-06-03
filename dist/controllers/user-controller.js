@@ -22,6 +22,7 @@ class UserController {
             try {
                 const user = yield user_service_1.default.createUser(req.body);
                 const response = (0, response_1.default)(true, user, null);
+                console.log(response);
                 res.status(201).json(response);
             }
             catch (err) {
