@@ -16,7 +16,6 @@ export class InvalidDataError extends Error {
     } 
 }
 
-
 export class ConflictError extends Error {
     
     code: number;
@@ -65,4 +64,17 @@ export class ForbiddenAccessError extends Error {
         this.code = 403;
         this.layer = layer
     }   
+}
+
+export class NotFoundError extends Error {
+    code: number;
+    layer: string;
+
+    constructor(layer:string, resourceName: string) {
+        super();
+        this.name = this.constructor.name;
+        this.message = `${resourceName} not found.`;
+        this.code = 404;
+        this.layer = layer
+    }
 }

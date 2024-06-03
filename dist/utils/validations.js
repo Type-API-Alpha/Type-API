@@ -36,14 +36,14 @@ class RequestBodyValidator {
         const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
         return this.validateField(password, passwordPattern, 'Missing password in the request body', 'The password must contain at least one letter, one number, and be at least 8 characters long.');
     }
-    validateUUID(ID) {
+    validateUUID(ID, entityName) {
         const response = {
             isValid: true,
             message: null
         };
         if (ID && !(0, uuid_1.validate)(ID)) {
             response.isValid = false;
-            response.message = 'Inválid ID. ID must be UUUID type.';
+            response.message = `Inválid ID. ${entityName} ID must be UUUID type.`;
             return response;
         }
         return response;

@@ -1,4 +1,3 @@
-import { Request } from "express";
 
 export type uuid = string;
 export type email = string;

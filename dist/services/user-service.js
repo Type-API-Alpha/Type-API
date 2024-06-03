@@ -35,11 +35,17 @@ class UserService {
             }
             const registeredEmail = yield user_repository_1.default.findUserByEmail(userInfos.email);
             if (registeredEmail) {
-                throw new err_1.ConflictError('Service layer', 'Inválid Email.');
+                throw new err_1.ConflictError('Service layer', 'Invalid Email.');
             }
             const hashedPassword = yield (0, hash_password_1.createHashPassword)(userInfos.password);
-            userInfos.password = hashedPassword;
-            const user = yield user_repository_1.default.insertNewUser(userInfos);
+            const userData = {
+                username: userInfos.username,
+                email: userInfos.email,
+                firstName: userInfos.firstName,
+                lastName: userInfos.lastName,
+                password: hashedPassword
+            };
+            const user = yield user_repository_1.default.insertNewUser(userData);
             const _a = user, { password } = _a, userWithoutPass = __rest(_a, ["password"]);
             return userWithoutPass;
         });

@@ -39,10 +39,8 @@ class LoginMiddleware {
                 if (!tokenDecoded) {
                     throw new err_1.UnauthorizedSessionError('Middleware layer(login)');
                 }
-                // Fazer uma declaração de tipo para adicionar a propriedade req.user;
                 const { userID, isAdmin } = tokenDecoded;
                 req.user = { userID, isAdmin };
-                console.log(req.user);
                 next();
             }
             catch (err) {
