@@ -12,5 +12,6 @@ const userRouter = (0, express_1.Router)();
 // userRouter.get('/user', UserController.getUsers);
 userRouter.post('/user', user_middleware_1.default.validadeRequestBodyToCreateUser, user_controller_1.default.createNewUser);
 userRouter.use(login_middleware_1.default.authorization);
+userRouter.get("/users/me", user_controller_1.default.getMyUser);
 userRouter.get("/users", user_controller_1.default.getAllUsers);
 exports.default = userRouter;

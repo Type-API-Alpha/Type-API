@@ -31,11 +31,11 @@ class UserService {
         return __awaiter(this, void 0, void 0, function* () {
             const usernameUsed = yield user_repository_1.default.findUserByUsername(userInfos.username);
             if (usernameUsed) {
-                throw new err_1.ConflictError('Service layer', 'Username already used.');
+                throw new err_1.ConflictError("Service layer", "Username already used.");
             }
             const registeredEmail = yield user_repository_1.default.findUserByEmail(userInfos.email);
             if (registeredEmail) {
-                throw new err_1.ConflictError('Service layer', 'Invalid Email.');
+                throw new err_1.ConflictError("Service layer", "Invalid Email.");
             }
             const hashedPassword = yield (0, hash_password_1.createHashPassword)(userInfos.password);
             const userData = {
@@ -43,7 +43,7 @@ class UserService {
                 email: userInfos.email,
                 firstName: userInfos.firstName,
                 lastName: userInfos.lastName,
-                password: hashedPassword
+                password: hashedPassword,
             };
             const user = yield user_repository_1.default.insertNewUser(userData);
             const _a = user, { password } = _a, userWithoutPass = __rest(_a, ["password"]);
@@ -54,6 +54,12 @@ class UserService {
         return __awaiter(this, void 0, void 0, function* () {
             const users = yield user_repository_1.default.getAllUsers();
             return users;
+        });
+    }
+    static getMyUser(userID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_repository_1.default.getMyUser(userID);
+            return user;
         });
     }
 }

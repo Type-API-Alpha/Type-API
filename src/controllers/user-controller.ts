@@ -3,6 +3,7 @@ import { ConflictError } from "../utils/err";
 import { IAPIResponse, IUser } from "../interfaces/interfaces";
 import UserService from "../services/user-service";
 import createResponse from "../utils/response";
+import { validate as uuidValidate } from "uuid";
 
 export default class UserController {
 	static async createNewUser(req: Request, res: Response): Promise<void> {
@@ -43,6 +44,28 @@ export default class UserController {
 				null,
 				"Internal server error"
 			);
+			res.status(500).json(response);
+		}
+	}
+
+	static async getMyUser(req: Request, res: Response): Promise<void> {
+		try {
+			const userID = req.user?.userID;
+			if (!userID) throw new Error("user do not have userID");
+
+			const isUUID = uuidValidate(userID);
+			if (!isUUID) throw new Error("uuid not");
+
+			const myUser = await UserService.getMyUser(userID);
+			const response = createResponse(true, myUser, null);
+			res.status(200).json(response);
+		} catch (error) {
+			const reason =
+				error instanceof Error
+					? error.message
+					: "Internal server error.";
+
+			const response = createResponse(false, null, reason);
 			res.status(500).json(response);
 		}
 	}

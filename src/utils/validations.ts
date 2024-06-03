@@ -67,7 +67,7 @@ export class RequestBodyValidator {
 
         if (ID && !uuidValidate(ID)) {
             response.isValid = false;
-            response.message = `Inválid ID. ${entityName} ID must be UUUID type.`;
+            response.message = `Invalid ID. ${entityName} ID must be UUID type.`;
             return response;
         }
 

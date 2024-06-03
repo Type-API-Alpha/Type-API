@@ -8,6 +8,12 @@ export default class UserRepository {
 		return rows;
 	}
 
+	static async getMyUser(userID: uuid): Promise<Partial<IUser>> {
+		const query = `SELECT id, username, email, first_name, last_name, squad FROM "User" WHERE id = $1;`;
+		const { rows } = await dBConnection.query(query, [userID]);
+		return rows[0];
+	}
+
 	static async insertNewUser(
 		userInfos: Partial<IUser>
 	): Promise<IUser | void> {
