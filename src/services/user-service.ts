@@ -14,13 +14,20 @@ export default class UserService {
 
         const registeredEmail = await UserRepository.findUserByEmail(userInfos.email as string);
         if (registeredEmail) {
-            throw new ConflictError('Service layer', 'Inválid Email.');
+            throw new ConflictError('Service layer', 'Invalid Email.');
         }
 
         const hashedPassword = await createHashPassword(userInfos.password as string);
-        userInfos.password = hashedPassword;
 
-        const user = await UserRepository.insertNewUser(userInfos);
+        const userData:Partial<IUser> = {
+            username: userInfos.username,
+            email: userInfos.email,
+            firstName: userInfos.firstName,
+            lastName: userInfos.lastName,
+            password: hashedPassword
+        }
+
+        const user = await UserRepository.insertNewUser(userData);
 
         const { password, ... userWithoutPass } = user as IUser;
 

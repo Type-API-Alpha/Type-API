@@ -1,8 +1,7 @@
-import { Request } from "express";
 
 export type uuid = string;
 export type email = string;
-export type typeName = 'name' | 'username' | 'firstName' | 'lastName';
+export type typeName = 'name' | 'username' | 'firstName' | 'lastName' | 'team name';
 export type validationFunction = () => IValidationResponse;
 export type jwt = string;
 

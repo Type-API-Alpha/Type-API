@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const validations_1 = require("../utils/validations");
 const _1 = __importDefault(require("."));
+const err_1 = require("../utils/err");
+const response_1 = __importDefault(require("../utils/response"));
 class UserMiddleware {
     static validadeRequestBodyToCreateUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -24,11 +26,32 @@ class UserMiddleware {
                 () => requestBodyValidator.validateName('firstName', userInfos.firstName),
                 () => requestBodyValidator.validateName('lastName', userInfos.lastName),
                 () => requestBodyValidator.validateUserEmail(userInfos.email),
-                () => requestBodyValidator.validateUserPassword(userInfos.password),
-                () => requestBodyValidator.validateUUID(userInfos.squad),
-                () => requestBodyValidator.validateAdminType(userInfos.isAdmin)
+                () => requestBodyValidator.validateUserPassword(userInfos.password)
             ];
             yield _1.default.validateRequest(req, res, next, validationFunctions);
+        });
+    }
+    static validateAdminUser(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const loggedUser = req.user;
+                const isAdmin = loggedUser.isAdmin === true;
+                if (!isAdmin) {
+                    throw new err_1.ForbiddenAccessError('Middlware layer');
+                }
+                next();
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, 'Internal server error.');
+                if (err instanceof err_1.ForbiddenAccessError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                    return;
+                }
+                else {
+                    res.status(500).json(response);
+                }
+            }
         });
     }
 }

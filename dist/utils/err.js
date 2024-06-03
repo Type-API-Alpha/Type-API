@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnauthorizedSessionError = exports.UnauthorizedError = exports.ConflictError = exports.InvalidDataError = void 0;
+exports.NotFoundError = exports.ForbiddenAccessError = exports.UnauthorizedSessionError = exports.UnauthorizedError = exports.ConflictError = exports.InvalidDataError = void 0;
 class InvalidDataError extends Error {
     constructor(layer, messages) {
         super();
@@ -39,3 +39,23 @@ class UnauthorizedSessionError extends UnauthorizedError {
     }
 }
 exports.UnauthorizedSessionError = UnauthorizedSessionError;
+class ForbiddenAccessError extends Error {
+    constructor(layer) {
+        super();
+        this.name = this.constructor.name;
+        this.message = 'Access denied: This resource is restricted to administrators only.';
+        this.code = 403;
+        this.layer = layer;
+    }
+}
+exports.ForbiddenAccessError = ForbiddenAccessError;
+class NotFoundError extends Error {
+    constructor(layer, resourceName) {
+        super();
+        this.name = this.constructor.name;
+        this.message = `${resourceName} not found.`;
+        this.code = 404;
+        this.layer = layer;
+    }
+}
+exports.NotFoundError = NotFoundError;

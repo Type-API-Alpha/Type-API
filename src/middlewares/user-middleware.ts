@@ -14,9 +14,7 @@ export default class UserMiddleware {
             () => requestBodyValidator.validateName('firstName', userInfos.firstName),
             () => requestBodyValidator.validateName('lastName', userInfos.lastName),
             () => requestBodyValidator.validateUserEmail(userInfos.email),
-            () => requestBodyValidator.validateUserPassword(userInfos.password),
-            () => requestBodyValidator.validateUUID( userInfos.squad),
-            () => requestBodyValidator.validateAdminType(userInfos.isAdmin)
+            () => requestBodyValidator.validateUserPassword(userInfos.password)
         ];
         
         await ValidationMiddleware.validateRequest(req, res, next, validationFunctions);
