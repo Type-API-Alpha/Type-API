@@ -58,10 +58,10 @@ export class ForbiddenAccessError extends Error {
     code: number;
     layer: string;
 
-    constructor(layer:string) {
+    constructor(layer:string, message: string) {
         super();
         this.name = this.constructor.name;
-        this.message = 'Access denied: This resource is restricted to administrators only.';
+        this.message = message; 
         this.code = 403;
         this.layer = layer
     }   

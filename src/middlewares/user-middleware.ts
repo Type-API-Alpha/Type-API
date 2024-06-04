@@ -30,7 +30,7 @@ export default class UserMiddleware {
             const isAdmin = loggedUser.isAdmin === true;
             
             if (!isAdmin) {
-                throw new ForbiddenAccessError('Middlware layer');
+                throw new ForbiddenAccessError('Middlware layer', "Access denied: This resource is restricted to administrators only.");
             }
 
             next();
