@@ -20,11 +20,24 @@ export default class TeamRepository {
     return rows[0];
   }
 
+  static async createTeam(team: Partial<ITeam>): Promise<ITeam | null>{
+    const query = "INSERT INTO Team (name, leader) VALUES ($1, $2) RETURNING *";
+
+    const { rows } = await dBConnection.query(query, [... Object.values(team)]);
+    return rows[0];
+  }
+
   static async findTeamByID(teamID: uuid):Promise<ITeam> {
       const query = 'SELECT * FROM Team WHERE id = $1';
       const { rows } = await dBConnection.query(query, [teamID]);
       return rows[0];
   }
+
+  static async findUserByName(name: string):Promise<ITeam | null> {
+    const query = 'SELECT * FROM Team WHERE name = $1';
+    const { rows } = await dBConnection.query(query, [ name ]);
+    return rows[0];
+  } 
 
   static async addNewMember(teamID: uuid, userID: uuid):Promise<IUser> {
       const query = 'UPDATE "User" SET squad = $1 WHERE id = $2 RETURNING *';
