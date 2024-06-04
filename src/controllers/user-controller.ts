@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ConflictError, ForbiddenAccessError, NotFoundError } from "../utils/err";
+import { ConflictError, ForbiddenAccessError, NotFoundError } from "../utils/err";
 import { IAPIResponse, IUser } from "../interfaces/interfaces";
 import UserService from "../services/user-service";
 import createResponse from "../utils/response";
