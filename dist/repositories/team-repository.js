@@ -14,6 +14,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_connection_1 = __importDefault(require("../database/db-connection"));
 class TeamRepository {
+    static getAllTeams() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = "SELECT * FROM Team";
+            const { rows } = yield db_connection_1.default.query(query);
+            return rows;
+        });
+    }
+    static getTeamById(teamId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = "SELECT * FROM Team WHERE id = $1";
+            const { rows } = yield db_connection_1.default.query(query, [teamId]);
+            return rows[0];
+        });
+    }
+    static getTeamByLeaderId(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = "SELECT * FROM Team WHERE leader = $1";
+            const { rows } = yield db_connection_1.default.query(query, [userId]);
+            return rows[0];
+        });
+    }
     static findTeamByID(teamID) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = 'SELECT * FROM Team WHERE id = $1';

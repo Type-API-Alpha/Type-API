@@ -16,6 +16,19 @@ const team_service_1 = __importDefault(require("../services/team-service"));
 const response_1 = __importDefault(require("../utils/response"));
 const err_1 = require("../utils/err");
 class TeamController {
+    static getAllTeams(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const teams = yield team_service_1.default.getAllTeams();
+                const response = (0, response_1.default)(true, teams, null);
+                res.status(200).json(response);
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, 'Internal server error.');
+                res.status(500).json(response);
+            }
+        });
+    }
     static addMember(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

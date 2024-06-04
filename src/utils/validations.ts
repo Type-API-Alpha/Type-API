@@ -1,5 +1,6 @@
 import { IValidationResponse, email, uuid, typeName } from "../interfaces/interfaces";
 import { validate as uuidValidate } from 'uuid';
+import TeamRepository from "../repositories/team-repository";
 
 export class RequestBodyValidator {
 

@@ -40,10 +40,10 @@ class UnauthorizedSessionError extends UnauthorizedError {
 }
 exports.UnauthorizedSessionError = UnauthorizedSessionError;
 class ForbiddenAccessError extends Error {
-    constructor(layer) {
+    constructor(layer, message) {
         super();
         this.name = this.constructor.name;
-        this.message = 'Access denied: This resource is restricted to administrators only.';
+        this.message = message;
         this.code = 403;
         this.layer = layer;
     }

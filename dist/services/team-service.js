@@ -27,6 +27,12 @@ const team_repository_1 = __importDefault(require("../repositories/team-reposito
 const user_repository_1 = __importDefault(require("../repositories/user-repository"));
 const err_1 = require("../utils/err");
 class TeamService {
+    static getAllTeams() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const teams = yield team_repository_1.default.getAllTeams();
+            return teams;
+        });
+    }
     static addNewMember(teamID, userID) {
         return __awaiter(this, void 0, void 0, function* () {
             const registeredUser = yield user_repository_1.default.findUserByID(userID);
