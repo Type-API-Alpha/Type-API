@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-// import TeamController from "../controllers/team-controller";
 const team_middleware_1 = __importDefault(require("../middlewares/team-middleware"));
 const team_controller_1 = __importDefault(require("../controllers/team-controller"));
 const teamRouter = (0, express_1.Router)();
-teamRouter.get('/team', team_middleware_1.default.validateUserType, team_controller_1.default.getAllTeams);
+teamRouter.get('/teams', team_middleware_1.default.validateUserType, team_controller_1.default.getAllTeams);
 teamRouter.post('/team', team_middleware_1.default.validadeRequestBodyToCreateTeam);
+teamRouter.post('/teams/:team_id/member/:user_id', team_middleware_1.default.validateIDsTypeToAddNewMembers, team_controller_1.default.addMember);
 exports.default = teamRouter;

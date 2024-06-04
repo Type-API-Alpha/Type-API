@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const team_service_1 = __importDefault(require("../services/team-service"));
 const response_1 = __importDefault(require("../utils/response"));
+const err_1 = require("../utils/err");
 class TeamController {
     static getAllTeams(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -25,6 +26,26 @@ class TeamController {
             catch (err) {
                 const response = (0, response_1.default)(false, null, 'Internal server error.');
                 res.status(500).json(response);
+            }
+        });
+    }
+    static addMember(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { team_id: teamID, user_id: userID } = req.params;
+                const newMember = yield team_service_1.default.addNewMember(teamID, userID);
+                const response = (0, response_1.default)(true, newMember, null);
+                res.status(201).json(response);
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, 'Internal server error');
+                if (err instanceof err_1.NotFoundError || err instanceof err_1.ConflictError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                }
+                else {
+                    res.status(500).json(response);
+                }
             }
         });
     }

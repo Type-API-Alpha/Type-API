@@ -12,4 +12,3 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(routes_1.default);
 app.listen(config_1.default.PORT);
-console.log(`Server running on port ${config_1.default.PORT}`);

@@ -1,5 +1,5 @@
 import dBConnection from "../database/db-connection";
-import { IUser, email } from "../interfaces/interfaces";
+import { IUser, email, uuid } from "../interfaces/interfaces";
 
 export default class UserRepository {
     
@@ -23,5 +23,11 @@ export default class UserRepository {
         const query = 'SELECT * FROM "User" WHERE email = $1';
         const { rows } = await dBConnection.query(query, [ email ]);
         return rows[0] as IUser;
-    } 
+    }
+    
+    static async findUserByID(userID: uuid):Promise<IUser | null> {
+        const query = 'SELECT * FROM "User" WHERE id = $1';
+        const { rows } = await dBConnection.query(query, [ userID ]);
+        return rows[0] as IUser;
+    }
 }

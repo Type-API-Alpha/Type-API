@@ -21,10 +21,12 @@ class UserController {
             try {
                 const user = yield user_service_1.default.createUser(req.body);
                 const response = (0, response_1.default)(true, user, null);
+                console.log(response);
                 res.status(201).json(response);
             }
             catch (err) {
                 const response = (0, response_1.default)(false, null, 'Internal server error.');
+                console.log(err);
                 if (err instanceof err_1.ConflictError) {
                     response.error = err.message;
                     res.status(err.code).json(response);

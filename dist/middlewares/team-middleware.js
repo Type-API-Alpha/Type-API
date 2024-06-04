@@ -24,7 +24,19 @@ class TeamMiddleware {
             const teamInfos = req.body;
             const validationFunctions = [
                 () => requestBodyValidator.validateName('team name', teamInfos.name),
-                () => requestBodyValidator.validateUUID(teamInfos.leader),
+                () => requestBodyValidator.validateUUID(teamInfos.leader, 'Leader'),
+            ];
+            yield _1.default.validateRequest(req, res, next, validationFunctions);
+        });
+    }
+    static validateIDsTypeToAddNewMembers(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const requestBodyValidator = new validations_1.RequestBodyValidator();
+            const teamID = req.params.team_id;
+            const userID = req.params.user_id;
+            const validationFunctions = [
+                () => requestBodyValidator.validateUUID(teamID, 'Team'),
+                () => requestBodyValidator.validateUUID(userID, 'User'),
             ];
             yield _1.default.validateRequest(req, res, next, validationFunctions);
         });
@@ -38,15 +50,12 @@ class TeamMiddleware {
                     return;
                 }
                 const team = yield team_repository_1.default.getTeamByLeaderId(loggedUser.userID);
-                console.log(loggedUser.isAdmin);
-                console.log(loggedUser.userID);
-                console.log(team);
                 if (!team) {
                     throw new err_1.ForbiddenAccessError("Middleware layer", "This user don't have permission.");
                 }
-                // if (req.params.team_id) {
+                // if (req.params.team_id && test) {
                 //     const paramTeam = await TeamRepository.getTeamById(req.params.team_id);
-                //     if (paramTeam.leader !== sessionToken.userID) {
+                //     if (paramTeam.leader !== loggedUser.userID) { // getuserbyid para pegar o squad
                 //         throw new ForbiddenAccessError("Middleware layer", "This user don't have permission.");
                 //     }
                 // }

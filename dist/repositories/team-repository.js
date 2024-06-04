@@ -35,5 +35,19 @@ class TeamRepository {
             return rows[0];
         });
     }
+    static findTeamByID(teamID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = 'SELECT * FROM Team WHERE id = $1';
+            const { rows } = yield db_connection_1.default.query(query, [teamID]);
+            return rows[0];
+        });
+    }
+    static addNewMember(teamID, userID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = 'UPDATE "User" SET squad = $1 WHERE id = $2 RETURNING *';
+            const { rows } = yield db_connection_1.default.query(query, [teamID, userID]);
+            return rows[0];
+        });
+    }
 }
 exports.default = TeamRepository;
