@@ -37,5 +37,9 @@ class LoginController {
             }
         });
     }
+    static logout(req, res) {
+        res.clearCookie("session_token");
+        res.status(200).json({ message: "Logout bem-sucedido" });
+    }
 }
 exports.default = LoginController;

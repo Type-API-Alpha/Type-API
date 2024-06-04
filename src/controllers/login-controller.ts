@@ -28,4 +28,9 @@ export default class LoginController {
             }
         }
     }
+
+    static logout(req: Request, res: Response):void {
+        res.clearCookie("session_token");
+        res.status(200).json({message: "Logout bem-sucedido"})
+    }
 }

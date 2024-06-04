@@ -36,5 +36,56 @@ class TeamController {
             }
         });
     }
+    static deleteMember(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
+            try {
+                const { team_id: teamID, user_id: userID } = req.params;
+                const checkleader = yield team_service_1.default.checkLeader(teamID);
+                const admin = (_a = req.user) === null || _a === void 0 ? void 0 : _a.isAdmin;
+                if (!admin && checkleader.leader !== ((_b = req.user) === null || _b === void 0 ? void 0 : _b.userID)) {
+                    throw new err_1.ForbiddenAccessError('Controller Layer');
+                }
+                const erasedMember = yield team_service_1.default.deleteMember(teamID, userID);
+                const response = (0, response_1.default)(true, erasedMember, null);
+                res.status(201).json(response);
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, 'Internal server error');
+                if (err instanceof err_1.NotFoundError || err instanceof err_1.ConflictError || err instanceof err_1.ForbiddenAccessError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                }
+                else {
+                    res.status(500).json(response);
+                }
+            }
+        });
+    }
+    static deleteTeam(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const admin = (_a = req.user) === null || _a === void 0 ? void 0 : _a.isAdmin;
+                if (!admin) {
+                    throw new err_1.ForbiddenAccessError('Controller Layer');
+                }
+                const { team_id: teamID } = req.params;
+                const erasedTeam = yield team_service_1.default.deleteTeam(teamID);
+                const response = (0, response_1.default)(true, erasedTeam, null);
+                res.status(200).json(response);
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, 'Internal server error');
+                if (err instanceof err_1.NotFoundError || err instanceof err_1.ConflictError || err instanceof err_1.ForbiddenAccessError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                }
+                else {
+                    res.status(500).json(response);
+                }
+            }
+        });
+    }
 }
 exports.default = TeamController;
