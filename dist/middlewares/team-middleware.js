@@ -29,7 +29,7 @@ class TeamMiddleware {
             yield _1.default.validateRequest(req, res, next, validationFunctions);
         });
     }
-    static validateIDsTypeToAddNewMembers(req, res, next) {
+    static validateIDTypeToAddNewMembers(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const requestBodyValidator = new validations_1.RequestBodyValidator();
             const teamID = req.params.team_id;
@@ -41,24 +41,40 @@ class TeamMiddleware {
             yield _1.default.validateRequest(req, res, next, validationFunctions);
         });
     }
-    static validateUserType(req, res, next) {
+    static validateAccessWithTeamLeaderRestriction(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const loggedUser = req.user;
+            const teamID = req.params.team_id;
+            if (loggedUser.isAdmin) {
+                next();
+                return;
+            }
+            yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID, teamID, true);
+        });
+    }
+    static validateAccessRestriction(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const loggedUser = req.user;
+            if (loggedUser.isAdmin) {
+                next();
+                return;
+            }
+            yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID);
+        });
+    }
+    static validateTeamLeader(req, res, next, loggedUserID, teamID, restrictToOwnTeam) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const loggedUser = req.user;
-                if (loggedUser.isAdmin) {
-                    next();
-                    return;
+                const isLeader = yield team_repository_1.default.getTeamByLeaderId(loggedUserID);
+                if (!isLeader) {
+                    throw new err_1.ForbiddenAccessError('Middleware layer', 'Access denied: This resource is restricted to administrators and the team leaders only.');
                 }
-                const team = yield team_repository_1.default.getTeamByLeaderId(loggedUser.userID);
-                if (!team) {
-                    throw new err_1.ForbiddenAccessError("Middleware layer", "This user don't have permission.");
+                if (restrictToOwnTeam && teamID) {
+                    const teamInfos = yield team_repository_1.default.findTeamByID(teamID);
+                    if (loggedUserID !== (teamInfos === null || teamInfos === void 0 ? void 0 : teamInfos.leader)) {
+                        throw new err_1.ForbiddenAccessError('Middleware layer', 'Access denied: This resource is restricted to administrators and the own team leader only.');
+                    }
                 }
-                // if (req.params.team_id && test) {
-                //     const paramTeam = await TeamRepository.getTeamById(req.params.team_id);
-                //     if (paramTeam.leader !== loggedUser.userID) { // getuserbyid para pegar o squad
-                //         throw new ForbiddenAccessError("Middleware layer", "This user don't have permission.");
-                //     }
-                // }
                 next();
             }
             catch (err) {
@@ -66,7 +82,6 @@ class TeamMiddleware {
                 if (err instanceof err_1.ForbiddenAccessError) {
                     response.error = err.message;
                     res.status(err.code).json(response);
-                    return;
                 }
                 else {
                     res.status(500).json(response);
