@@ -10,6 +10,7 @@ const userRouter: Router = Router();
 // userRouter.get('/user', UserController.getUsers);
 userRouter.post('/user', UserMiddleware.validadeRequestBodyToCreateUser, UserController.createNewUser);
 userRouter.use(LoginMiddleware.authorization);
+userRouter.delete('/users/:user_id', UserController.deleteUser);
 
 
 export default userRouter;
