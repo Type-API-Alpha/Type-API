@@ -50,5 +50,16 @@ class UserService {
             return userWithoutPass;
         });
     }
+    static deleteUser(userToErase) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const checkUser = yield user_repository_1.default.findUserByID(userToErase);
+            if (!checkUser) {
+                throw new err_1.NotFoundError('Service Layer', 'User');
+            }
+            const erasedUser = yield user_repository_1.default.deleteUser(userToErase);
+            const { password } = erasedUser, entityerased = __rest(erasedUser, ["password"]);
+            return entityerased;
+        });
+    }
 }
 exports.default = UserService;

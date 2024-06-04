@@ -12,4 +12,5 @@ const userRouter = (0, express_1.Router)();
 // userRouter.get('/user', UserController.getUsers);
 userRouter.post('/user', user_middleware_1.default.validadeRequestBodyToCreateUser, user_controller_1.default.createNewUser);
 userRouter.use(login_middleware_1.default.authorization);
+userRouter.delete('/users/:user_id', user_controller_1.default.deleteUser);
 exports.default = userRouter;

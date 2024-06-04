@@ -1,6 +1,6 @@
-import { IUser } from "../interfaces/interfaces";
+import { IUser, uuid } from "../interfaces/interfaces";
 import UserRepository from "../repositories/user-repository";
-import { ConflictError } from "../utils/err";
+import { ConflictError, NotFoundError } from "../utils/err";
 import { createHashPassword } from "../utils/hash-password";
 
 export default class UserService {
@@ -32,5 +32,15 @@ export default class UserService {
         const { password, ... userWithoutPass } = user as IUser;
 
         return userWithoutPass;
+    }
+    static async deleteUser(userToErase:uuid):Promise<Partial<IUser>>{
+        const checkUser:IUser | null = await UserRepository.findUserByID(userToErase);
+        
+        if(!checkUser){
+            throw new NotFoundError('Service Layer', 'User');
+        }
+        const erasedUser:IUser = await UserRepository.deleteUser(userToErase)  
+        const {password, ... entityerased} = erasedUser;
+        return entityerased;
     }
 }
