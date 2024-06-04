@@ -8,7 +8,7 @@ export default class UserRepository {
 		return rows;
 	}
 
-	static async getMyUser(userID: uuid): Promise<Partial<IUser>> {
+	static async getUserByID(userID: uuid): Promise<Partial<IUser>> {
 		const query = `SELECT id, username, email, first_name, last_name, squad FROM "User" WHERE id = $1;`;
 		const { rows } = await dBConnection.query(query, [userID]);
 		return rows[0];

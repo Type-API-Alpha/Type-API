@@ -41,12 +41,20 @@ export default class UserService {
 	}
 
 	static async getAllUsers(): Promise<Partial<IUser[]>> {
+		// isAdmin validation?
 		const users = await UserRepository.getAllUsers();
 		return users;
 	}
 
 	static async getMyUser(userID: uuid): Promise<Partial<IUser>> {
-		const user = await UserRepository.getMyUser(userID);
+		// validations
+		const user = await UserRepository.getUserByID(userID);
+		return user;
+	}
+
+	static async getOneUser(userID: uuid, targetUserID:uuid): Promise<Partial<IUser>> {
+		// validations
+		const user = await UserRepository.getUserByID(userID);
 		return user;
 	}
 }
