@@ -49,5 +49,19 @@ class TeamRepository {
             return rows[0];
         });
     }
+    static deleteMember(userID, teamID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = 'UPDATE "User" SET squad = NULL WHERE id = $1 AND squad = $2 RETURNING *';
+            const { rows } = yield db_connection_1.default.query(query, [userID, teamID]);
+            return rows[0];
+        });
+    }
+    static deleteTeam(teamID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = 'DELETE FROM Team WHERE id = $1 RETURNING *';
+            const { rows } = yield db_connection_1.default.query(query, [teamID]);
+            return rows[0];
+        });
+    }
 }
 exports.default = TeamRepository;

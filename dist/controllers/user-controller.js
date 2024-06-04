@@ -37,5 +37,30 @@ class UserController {
             }
         });
     }
+    static deleteUser(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                const { user_id: userToErase } = req.params;
+                const admin = (_a = req.user) === null || _a === void 0 ? void 0 : _a.isAdmin;
+                if (!admin) {
+                    throw new err_1.ForbiddenAccessError('Controller Layer', 'Forbidden Access!');
+                }
+                const erased = yield user_service_1.default.deleteUser(userToErase);
+                const response = (0, response_1.default)(true, erased, null);
+                res.status(200).json(response);
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, 'Internal server error.');
+                if (err instanceof err_1.ForbiddenAccessError || err instanceof err_1.NotFoundError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                }
+                else {
+                    res.status(500).json(response);
+                }
+            }
+        });
+    }
 }
 exports.default = UserController;

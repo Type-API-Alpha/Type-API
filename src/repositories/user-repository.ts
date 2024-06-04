@@ -30,4 +30,16 @@ export default class UserRepository {
         const { rows } = await dBConnection.query(query, [ userID ]);
         return rows[0] as IUser;
     }
+
+    static async deleteUser(userID:uuid):Promise<IUser>{
+        const query = 'DELETE FROM "User" WHERE id = $1 RETURNING * ';
+        const {rows} = await dBConnection.query(query, [userID]);
+        return rows[0] as IUser;
+    }
+
+    static async findBySquad(teamID:uuid):Promise<IUser>{
+        const query = 'SELECT * FROM "User" WHERE squad = $1';
+        const {rows} = await dBConnection.query(query, [teamID]);
+        return rows[0] as IUser;
+    }
 }
