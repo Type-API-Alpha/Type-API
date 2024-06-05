@@ -39,6 +39,12 @@ class TeamService {
             return team;
         });
     }
+    static getMembersByTeamId(teamId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const members = yield user_repository_1.default.findAllUsersBySquad(teamId);
+            return members;
+        });
+    }
     static createTeam(team) {
         return __awaiter(this, void 0, void 0, function* () {
             const teamNameUsed = yield team_repository_1.default.findUserByName(team.name);

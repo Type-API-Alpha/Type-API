@@ -1,4 +1,4 @@
-import { ICookieOptions, ILoginTokenPayload, IUser, IUserDatabase, email } from "../interfaces/interfaces";
+import { ICookieOptions, ILoginTokenPayload, IUser, IUserDatabase, email, uuid } from "../interfaces/interfaces";
 import UserRepository from "../repositories/user-repository";
 import { UnauthorizedError } from "../utils/err";
 import { comparePassword } from "../utils/hash-password";
@@ -27,8 +27,10 @@ export default class LoginService {
 
         const payload:ILoginTokenPayload = {
             userID: authenticatedUser.id as string,
-            isAdmin: authenticatedUser.is_admin as boolean
+            isAdmin: authenticatedUser.is_admin as boolean,
+            squad: authenticatedUser.squad as uuid
         }   
+        
         const tokenOption = { expiresIn: '8h'};
         const sessionToken = createToken(payload, tokenOption);
 

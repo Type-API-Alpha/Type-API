@@ -34,8 +34,8 @@ export default class LoginMiddleware {
                 throw new UnauthorizedSessionError('Middleware layer(login)');   
             }
 
-            const { userID, isAdmin } = tokenDecoded; 
-            req.user = {userID, isAdmin};
+            const { userID, isAdmin, squad } = tokenDecoded; 
+            req.user = { userID, isAdmin, squad };
             
             next();
         } catch (err) {

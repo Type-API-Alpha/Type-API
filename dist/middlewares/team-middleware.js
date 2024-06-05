@@ -17,8 +17,6 @@ const _1 = __importDefault(require("."));
 const team_repository_1 = __importDefault(require("../repositories/team-repository"));
 const err_1 = require("../utils/err");
 const response_1 = __importDefault(require("../utils/response"));
-const user_repository_1 = __importDefault(require("../repositories/user-repository"));
-const user_service_1 = __importDefault(require("../services/user-service"));
 class TeamMiddleware {
     static validadeRequestBodyToCreateTeam(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -54,7 +52,7 @@ class TeamMiddleware {
             yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID, teamID, true);
         });
     }
-    static validateAccessWithTeamMember(req, res, next) {
+    static validateAccessWithTeamMemberRestriction(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const loggedUser = req.user;
             const teamID = req.params.team_id;
@@ -62,34 +60,13 @@ class TeamMiddleware {
                 next();
                 return;
             }
-            const isLeader = yield user_service_1.default.isLeader(loggedUser.userID);
-            if (isLeader) {
+            if (loggedUser.squad === teamID) {
+                console.log(loggedUser.squad);
                 next();
                 return;
             }
-            yield TeamMiddleware.validateTeamMember(req, res, next, teamID);
-        });
-    }
-    static validateTeamMember(req, res, next, teamID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const userSquad = yield user_repository_1.default.findBySquad(teamID);
-                console.log(userSquad);
-                if (!userSquad) {
-                    throw new err_1.ForbiddenAccessError('Middleware layer', 'Access denied: This resource is restricted to administrators, team leaders or members of this team only.');
-                }
-                next();
-            }
-            catch (err) {
-                const response = (0, response_1.default)(false, null, "Internal server error.");
-                if (err instanceof err_1.ForbiddenAccessError) {
-                    response.error = err.message;
-                    res.status(err.code).json(response);
-                }
-                else {
-                    res.status(500).json(response);
-                }
-            }
+            console.log(loggedUser);
+            yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID);
         });
     }
     static validateAccessRestriction(req, res, next) {

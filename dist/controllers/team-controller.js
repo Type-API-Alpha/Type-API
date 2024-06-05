@@ -50,6 +50,26 @@ class TeamController {
             }
         });
     }
+    static getMembersByTeamId(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const teamId = req.params.team_id;
+                const members = yield team_service_1.default.getMembersByTeamId(teamId);
+                const response = (0, response_1.default)(true, members, null);
+                res.status(201).json(response);
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, 'Internal server error');
+                if (err instanceof err_1.ConflictError || err instanceof err_1.NotFoundError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                }
+                else {
+                    res.status(500).json(response);
+                }
+            }
+        });
+    }
     static createTeam(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
