@@ -5,7 +5,12 @@ import {
 	ForbiddenAccessError,
 	NotFoundError,
 } from "../utils/err";
-import { IAPIResponse, ILoginTokenPayload, IUser, uuid } from "../interfaces/interfaces";
+import {
+	IAPIResponse,
+	ILoginTokenPayload,
+	IUser,
+	uuid,
+} from "../interfaces/interfaces";
 import UserService from "../services/user-service";
 import createResponse from "../utils/response";
 import { validate as uuidValidate } from "uuid";
@@ -38,6 +43,12 @@ export default class UserController {
 
 	static async getAllUsers(req: Request, res: Response): Promise<void> {
 		try {
+			const user = req.user as ILoginTokenPayload;
+			if (!user.isAdmin)
+				throw new ForbiddenAccessError(
+					"controller",
+					"access denied. this info is admin only."
+				);
 			const users = (await UserService.getAllUsers()) ?? [
 				"No data available",
 			];
@@ -49,7 +60,12 @@ export default class UserController {
 				null,
 				"Internal server error"
 			);
-			res.status(500).json(response);
+			if (error instanceof ForbiddenAccessError) {
+				response.error = error.message;
+				res.status(error.code).json(response);
+			} else {
+				res.status(500).json(response);
+			}
 		}
 	}
 
@@ -76,19 +92,23 @@ export default class UserController {
 
 	static async getOneUser(req: Request, res: Response): Promise<void> {
 		try {
-			const userID = req.user?.userID;
+			const user = req.user as ILoginTokenPayload;
 			const targetUserID = req.params.userID;
-			if (!userID || !targetUserID) {
+			if (!user.userID || !targetUserID) {
 				throw new InvalidDataError("controller", [
 					"a parameter /id is needed in api url.",
 					"example: api/v1/users/1234",
 				]);
 			}
-			const isUUID = uuidValidate(userID) && uuidValidate(targetUserID);
+			const isUUID =
+				uuidValidate(user.userID) && uuidValidate(targetUserID);
 			if (!isUUID) throw new Error("uuid is not valid.");
 
-			const user = await UserService.getOneUser(userID, targetUserID);
-			const response = createResponse(true, user, null);
+			const foundUser = await UserService.getOneUser(
+				user.userID,
+				targetUserID
+			);
+			const response = createResponse(true, foundUser, null);
 			res.status(200).json(response);
 		} catch (error) {
 			if (error instanceof InvalidDataError) {
@@ -140,24 +160,40 @@ export default class UserController {
 		}
 	}
 
-    static async updateUser(req: Request, res: Response): Promise<void> {
-        try {
-            const loggedUser = req.user as ILoginTokenPayload;
-            const userIDToUpdate:uuid = req.params.user_id;
-            const newUserInfos = req.body;
+	static async updateUser(req: Request, res: Response): Promise<void> {
+		try {
+			const loggedUser = req.user as ILoginTokenPayload;
+			const userIDToUpdate: uuid = req.params.user_id;
+			const newUserInfos = req.body;
 
-            const updatedUser = await UserService.updateUserInfos(loggedUser, userIDToUpdate, newUserInfos);
-            const response = createResponse<Partial<IUser>>(true, updatedUser, null);
-            res.status(200).json(response);
-        } catch (err) {
-            const response = createResponse<null>(false, null, 'Internal server error.');
-            
-            if (err instanceof ConflictError || err instanceof ForbiddenAccessError || err instanceof NotFoundError) {
-                response.error = err.message;
-                res.status(err.code).json(response);
-            } else {
-                res.status(500).json(response);
-            }
-        }
-    }
+			const updatedUser = await UserService.updateUserInfos(
+				loggedUser,
+				userIDToUpdate,
+				newUserInfos
+			);
+			const response = createResponse<Partial<IUser>>(
+				true,
+				updatedUser,
+				null
+			);
+			res.status(200).json(response);
+		} catch (err) {
+			const response = createResponse<null>(
+				false,
+				null,
+				"Internal server error."
+			);
+
+			if (
+				err instanceof ConflictError ||
+				err instanceof ForbiddenAccessError ||
+				err instanceof NotFoundError
+			) {
+				response.error = err.message;
+				res.status(err.code).json(response);
+			} else {
+				res.status(500).json(response);
+			}
+		}
+	}
 }

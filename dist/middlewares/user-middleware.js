@@ -43,12 +43,12 @@ class UserMiddleware {
                 const loggedUser = req.user;
                 const isAdmin = loggedUser.isAdmin === true;
                 if (!isAdmin) {
-                    throw new err_1.ForbiddenAccessError('Middleware layer');
+                    throw new err_1.ForbiddenAccessError("Middleware layer", "Access denied: This resource is restricted to administrators only.");
                 }
                 next();
             }
             catch (err) {
-                const response = (0, response_1.default)(false, null, 'Internal server error.');
+                const response = (0, response_1.default)(false, null, "Internal server error.");
                 if (err instanceof err_1.ForbiddenAccessError) {
                     response.error = err.message;
                     res.status(err.code).json(response);

@@ -16,16 +16,9 @@ const db_connection_1 = __importDefault(require("../database/db-connection"));
 class UserRepository {
     static getAllUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = `SELECT id, username, email, first_name, last_name, squad FROM "User";`;
+            const query = `SELECT id, username, email, first_name, last_name, squad, is_admin FROM "User";`;
             const { rows } = yield db_connection_1.default.query(query);
             return rows;
-        });
-    }
-    static getMyUser(userID) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const query = `SELECT id, username, email, first_name, last_name, squad FROM "User" WHERE id = $1;`;
-            const { rows } = yield db_connection_1.default.query(query, [userID]);
-            return rows[0];
         });
     }
     static insertNewUser(userInfos) {
