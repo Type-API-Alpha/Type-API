@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ITeam, IAPIResponse, uuid } from "../interfaces/interfaces";
+import { ITeam, IAPIResponse, ILoginTokenPayload, uuid } from "../interfaces/interfaces";
 import TeamService from "../services/team-service";
 import createResponse from "../utils/response";
 import { IUser } from "../interfaces/interfaces";
@@ -101,5 +101,24 @@ export default class TeamController {
             }
         }
     }
+    static async updateTeam(req: Request, res: Response): Promise<void>{
+        try {
+            const loggedUser = req.user as ILoginTokenPayload;
+            const teamIDToUpdate:uuid = req.params.team_id;
+            const newTeamInfos = req.body;
 
+            const updatedTeam = await TeamService.updateTeam(loggedUser, newTeamInfos, teamIDToUpdate);
+            const response = createResponse<Partial<IUser>>(true, updatedTeam, null);
+            res.status(200).json(response);
+        } catch (err: any) {
+            const response = createResponse<null>(false, null, 'Internal server error.');
+            
+            if (err instanceof ConflictError || err instanceof ForbiddenAccessError || err instanceof NotFoundError) {
+                response.error = err.message;
+                res.status(err.code).json(response);
+            } else {
+                res.status(500).json(response);
+            }
+        }
+    }
 }

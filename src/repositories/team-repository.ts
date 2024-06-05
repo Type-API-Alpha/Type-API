@@ -33,7 +33,7 @@ export default class TeamRepository {
       return rows[0];
   }
 
-  static async findUserByName(name: string):Promise<ITeam | null> {
+  static async findTeamByName(name: string):Promise<ITeam | null> {
     const query = 'SELECT * FROM Team WHERE name = $1';
     const { rows } = await dBConnection.query(query, [ name ]);
     return rows[0];
@@ -55,6 +55,15 @@ export default class TeamRepository {
         const query = 'DELETE FROM Team WHERE id = $1 RETURNING *';
         const {rows} = await dBConnection.query(query, [teamID]);
         return rows[0]
+    }
+
+    static async updateTeam(teamInfos: ITeam): Promise<ITeam>{
+        const team: ITeam = {name: teamInfos.name, leader: teamInfos.leader, id: teamInfos.id}
+
+        const query = 'UPDATE Team SET name = $1, leader = $2 WHERE id = $3'
+
+        const { rows } = await dBConnection.query(query, [... Object.values(team)]);
+        return rows[0];
     }
 
 }

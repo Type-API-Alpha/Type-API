@@ -49,7 +49,7 @@ class TeamRepository {
             return rows[0];
         });
     }
-    static findUserByName(name) {
+    static findTeamByName(name) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = 'SELECT * FROM Team WHERE name = $1';
             const { rows } = yield db_connection_1.default.query(query, [name]);
@@ -74,6 +74,14 @@ class TeamRepository {
         return __awaiter(this, void 0, void 0, function* () {
             const query = 'DELETE FROM Team WHERE id = $1 RETURNING *';
             const { rows } = yield db_connection_1.default.query(query, [teamID]);
+            return rows[0];
+        });
+    }
+    static updateTeam(teamInfos) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const team = { name: teamInfos.name, leader: teamInfos.leader, id: teamInfos.id };
+            const query = 'UPDATE Team SET name = $1, leader = $2 WHERE id = $3';
+            const { rows } = yield db_connection_1.default.query(query, [...Object.values(team)]);
             return rows[0];
         });
     }

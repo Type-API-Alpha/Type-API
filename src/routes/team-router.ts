@@ -13,6 +13,7 @@ teamRouter.post('/teams/:team_id/member/:user_id',
     TeamMiddleware.validateAccessWithTeamLeaderRestriction,
     TeamController.addMember
 );
+teamRouter.patch('/teams/:team_id', TeamMiddleware.validateAccessWithTeamLeaderRestriction, TeamController.updateTeam);
 teamRouter.delete('/teams/:team_id/member/:user_id', TeamController.deleteMember);
 teamRouter.delete('/teams/:team_id', TeamController.deleteTeam);
 

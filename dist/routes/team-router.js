@@ -11,6 +11,7 @@ const teamRouter = (0, express_1.Router)();
 teamRouter.get('/teams', team_middleware_1.default.validateAccessRestriction, team_controller_1.default.getAllTeams);
 teamRouter.post('/teams', user_middleware_1.default.validateAdminUser, team_middleware_1.default.validadeRequestBodyToCreateTeam, team_controller_1.default.createTeam);
 teamRouter.post('/teams/:team_id/member/:user_id', team_middleware_1.default.validateIDTypeToAddNewMembers, team_middleware_1.default.validateAccessWithTeamLeaderRestriction, team_controller_1.default.addMember);
+teamRouter.patch('/teams/:team_id', user_middleware_1.default.validateRequestBodyUser, team_middleware_1.default.validateAccessWithTeamLeaderRestriction, team_controller_1.default.updateTeam);
 teamRouter.delete('/teams/:team_id/member/:user_id', team_controller_1.default.deleteMember);
 teamRouter.delete('/teams/:team_id', team_controller_1.default.deleteTeam);
 exports.default = teamRouter;
