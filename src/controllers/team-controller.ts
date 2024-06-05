@@ -89,7 +89,8 @@ export default class TeamController {
             
         } catch (err) {
             const response = createResponse<null>(false, null, 'Internal server error');
-
+            console.log(err);
+            
             if (err instanceof NotFoundError || err instanceof ConflictError) {
                 response.error = err.message;
                 res.status(err.code).json(response);

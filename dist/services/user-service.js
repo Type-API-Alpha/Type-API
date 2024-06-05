@@ -163,3 +163,16 @@ class UserService {
     }
 }
 exports.default = UserService;
+//   static async isLeader(userId: string): Promise<boolean> {
+//       let isLeader = false;
+//       const userInfos = await UserRepository.findUserByID(userId)
+//       if(userInfos) {
+//           const userSquad = userInfos.squad; 
+//           const teamLeader = await TeamService.checkLeader(userSquad);
+//           if(teamLeader.leader === userId) {
+//               return isLeader = true;
+//           }
+//       }
+//       return isLeader;
+//     }
+// }

@@ -26,6 +26,7 @@ class UserController {
             }
             catch (err) {
                 const response = (0, response_1.default)(false, null, "Internal server error.");
+                console.log(err);
                 if (err instanceof err_1.ConflictError) {
                     response.error = err.message;
                     res.status(err.code).json(response);

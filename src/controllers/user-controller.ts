@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import {
 	ConflictError,
 	InvalidDataError,
@@ -31,7 +31,7 @@ export default class UserController {
 				null,
 				"Internal server error."
 			);
-
+			
 			if (err instanceof ConflictError) {
 				response.error = err.message;
 				res.status(err.code).json(response);

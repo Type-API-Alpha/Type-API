@@ -61,11 +61,9 @@ class TeamMiddleware {
                 return;
             }
             if (loggedUser.squad === teamID) {
-                console.log(loggedUser.squad);
                 next();
                 return;
             }
-            console.log(loggedUser);
             yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID);
         });
     }

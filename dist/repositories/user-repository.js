@@ -92,8 +92,7 @@ class UserRepository {
                 const property = ` ${userPropertyList[i]} = $${i + 1},`;
                 query += property;
             }
-            const formattedQuery = query.slice(0, -1) +
-                ` WHERE id = $${userPropertyList.length + 1} RETURNING *;`;
+            const formattedQuery = query.slice(0, -1) + ` WHERE id = $${userPropertyList.length + 1} RETURNING *;`;
             const { rows } = yield db_connection_1.default.query(formattedQuery, newValues);
             return rows[0];
         });

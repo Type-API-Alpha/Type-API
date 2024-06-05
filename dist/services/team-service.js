@@ -52,7 +52,6 @@ class TeamService {
                 throw new err_1.ConflictError("Service layer", "Team Name already used.");
             }
             const userData = yield user_repository_1.default.findUserByID(team.leader);
-            console.log(userData);
             if (!userData) {
                 throw new err_1.NotFoundError("Service layer", "User");
             }
@@ -83,6 +82,10 @@ class TeamService {
             }
             if (registeredUser.squad) {
                 throw new err_1.ConflictError("Service layer", "User cannot be added to the team: the user is already a member of another team.");
+            }
+            console.log(registeredUser);
+            if (registeredUser.isAdmin) {
+                throw new err_1.ConflictError("Service layer", "The admin cannot be a leader or be part of a group.");
             }
             const newMember = yield team_repository_1.default.addNewMember(teamID, userID);
             const { password } = newMember, newMemberWithoutPass = __rest(newMember, ["password"]);
@@ -122,11 +125,11 @@ class TeamService {
         return __awaiter(this, void 0, void 0, function* () {
             const checkTeam = yield team_repository_1.default.findTeamByID(teamID);
             if (!checkTeam) {
-                throw new err_1.NotFoundError("Service Layer", "Team");
+                throw new err_1.NotFoundError('Service Layer', 'Team');
             }
             const emptyCheck = yield user_repository_1.default.findBySquad(teamID);
             if (emptyCheck) {
-                throw new err_1.ConflictError("Service Layer", "The team cannot be deleted, since is not empty");
+                throw new err_1.ConflictError('Service Layer', 'The team cannot be deleted, since is not empty');
             }
             const erasedTeam = yield team_repository_1.default.deleteTeam(teamID);
             return erasedTeam;
@@ -139,16 +142,13 @@ class TeamService {
                 throw new err_1.NotFoundError('Service layer', 'Team');
             }
             const updatedTeam = Object.assign(Object.assign({}, team), teamInfos);
-            console.log(updatedTeam);
             if (teamInfos.name) {
                 const teamNameUsed = yield team_repository_1.default.findTeamByName(updatedTeam.name);
                 if (teamNameUsed) {
                     throw new err_1.ConflictError('Service layer', 'Team Name already used.');
                 }
             }
-            // this.checkUserPermissions(loggedUser, team);
             const userData = yield user_repository_1.default.findUserByID(updatedTeam.leader);
-            console.log(userData);
             if (!userData) {
                 throw new err_1.NotFoundError('Service layer', 'User');
             }
@@ -161,12 +161,6 @@ class TeamService {
             const updatedTeamData = yield team_repository_1.default.updateTeam(updatedTeam);
             return updatedTeamData;
         });
-    }
-    static checkUserPermissions(loggedUser, teamToUpdate) {
-        console.log(loggedUser, teamToUpdate);
-        if (!loggedUser.isAdmin && loggedUser.userID !== teamToUpdate.leader) {
-            throw new err_1.ForbiddenAccessError('Service layer', 'Access denied: This resource is restricted to administrators or the leader team.');
-        }
     }
 }
 exports.default = TeamService;
