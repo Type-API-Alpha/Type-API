@@ -27,6 +27,12 @@ const team_repository_1 = __importDefault(require("../repositories/team-reposito
 const user_repository_1 = __importDefault(require("../repositories/user-repository"));
 const err_1 = require("../utils/err");
 class TeamService {
+    static getAllTeams() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const teams = yield team_repository_1.default.getAllTeams();
+            return teams;
+        });
+    }
     static addNewMember(teamID, userID) {
         return __awaiter(this, void 0, void 0, function* () {
             const registeredUser = yield user_repository_1.default.findUserByID(userID);
@@ -43,6 +49,49 @@ class TeamService {
             const newMember = yield team_repository_1.default.addNewMember(teamID, userID);
             const { password } = newMember, newMemberWithoutPass = __rest(newMember, ["password"]);
             return newMemberWithoutPass;
+        });
+    }
+    static checkLeader(teamID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const checkTeamLeader = yield team_repository_1.default.findTeamByID(teamID);
+            if (!checkTeamLeader) {
+                throw new err_1.NotFoundError('Service Layer', 'Team');
+            }
+            return checkTeamLeader;
+        });
+    }
+    static deleteMember(teamID, userID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const checkTeam = yield team_repository_1.default.findTeamByID(teamID);
+            if (!checkTeam) {
+                throw new err_1.NotFoundError('Service Layer', 'Team');
+            }
+            const checkUser = yield user_repository_1.default.findUserByID(userID);
+            if (!checkUser) {
+                throw new err_1.NotFoundError('Service Layer', 'User');
+            }
+            else if (checkUser.squad !== teamID) {
+                throw new err_1.ConflictError('Service layer', 'User does not belong to the selected Team');
+            }
+            else {
+                const deletedMember = yield team_repository_1.default.deleteMember(userID, teamID);
+                const { password } = deletedMember, entityWithoutPassword = __rest(deletedMember, ["password"]);
+                return entityWithoutPassword;
+            }
+        });
+    }
+    static deleteTeam(teamID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const checkTeam = yield team_repository_1.default.findTeamByID(teamID);
+            if (!checkTeam) {
+                throw new err_1.NotFoundError('Service Layer', 'Team');
+            }
+            const emptyCheck = yield user_repository_1.default.findBySquad(teamID);
+            if (emptyCheck) {
+                throw new err_1.ConflictError('Service Layer', 'The team cannot be deleted, since is not empty');
+            }
+            const erasedTeam = yield team_repository_1.default.deleteTeam(teamID);
+            return erasedTeam;
         });
     }
 }

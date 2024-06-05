@@ -61,5 +61,19 @@ class UserRepository {
             return rows[0];
         });
     }
+    static deleteUser(userID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = 'DELETE FROM "User" WHERE id = $1 RETURNING * ';
+            const { rows } = yield db_connection_1.default.query(query, [userID]);
+            return rows[0];
+        });
+    }
+    static findBySquad(teamID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = 'SELECT * FROM "User" WHERE squad = $1';
+            const { rows } = yield db_connection_1.default.query(query, [teamID]);
+            return rows[0];
+        });
+    }
 }
 exports.default = UserRepository;

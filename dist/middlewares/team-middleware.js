@@ -14,6 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const validations_1 = require("../utils/validations");
 const _1 = __importDefault(require("."));
+const team_repository_1 = __importDefault(require("../repositories/team-repository"));
+const err_1 = require("../utils/err");
+const response_1 = __importDefault(require("../utils/response"));
 class TeamMiddleware {
     static validadeRequestBodyToCreateTeam(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -26,7 +29,7 @@ class TeamMiddleware {
             yield _1.default.validateRequest(req, res, next, validationFunctions);
         });
     }
-    static validateIDsTypeToAddNewMembers(req, res, next) {
+    static validateIDTypeToAddNewMembers(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const requestBodyValidator = new validations_1.RequestBodyValidator();
             const teamID = req.params.team_id;
@@ -36,6 +39,54 @@ class TeamMiddleware {
                 () => requestBodyValidator.validateUUID(userID, 'User'),
             ];
             yield _1.default.validateRequest(req, res, next, validationFunctions);
+        });
+    }
+    static validateAccessWithTeamLeaderRestriction(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const loggedUser = req.user;
+            const teamID = req.params.team_id;
+            if (loggedUser.isAdmin) {
+                next();
+                return;
+            }
+            yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID, teamID, true);
+        });
+    }
+    static validateAccessRestriction(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const loggedUser = req.user;
+            if (loggedUser.isAdmin) {
+                next();
+                return;
+            }
+            yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID);
+        });
+    }
+    static validateTeamLeader(req, res, next, loggedUserID, teamID, restrictToOwnTeam) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const isLeader = yield team_repository_1.default.getTeamByLeaderId(loggedUserID);
+                if (!isLeader) {
+                    throw new err_1.ForbiddenAccessError('Middleware layer', 'Access denied: This resource is restricted to administrators and the team leaders only.');
+                }
+                if (restrictToOwnTeam && teamID) {
+                    const teamInfos = yield team_repository_1.default.findTeamByID(teamID);
+                    if (loggedUserID !== (teamInfos === null || teamInfos === void 0 ? void 0 : teamInfos.leader)) {
+                        throw new err_1.ForbiddenAccessError('Middleware layer', 'Access denied: This resource is restricted to administrators and the own team leader only.');
+                    }
+                }
+                next();
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, "Internal server error.");
+                if (err instanceof err_1.ForbiddenAccessError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                }
+                else {
+                    res.status(500).json(response);
+                }
+            }
         });
     }
 }

@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
-import { ConflictError, InvalidDataError } from "../utils/err";
+import {
+	ConflictError,
+	InvalidDataError,
+	ForbiddenAccessError,
+	NotFoundError,
+} from "../utils/err";
 import { IAPIResponse, IUser } from "../interfaces/interfaces";
 import UserService from "../services/user-service";
 import createResponse from "../utils/response";
@@ -101,6 +106,38 @@ export default class UserController {
 
 			const response = createResponse(false, null, reason);
 			res.status(500).json(response);
+		}
+	}
+
+	static async deleteUser(req: Request, res: Response): Promise<void> {
+		try {
+			const { user_id: userToErase } = req.params;
+			const admin = req.user?.isAdmin;
+			if (!admin) {
+				throw new ForbiddenAccessError(
+					"Controller Layer",
+					"Forbidden Access!"
+				);
+			}
+			const erased = await UserService.deleteUser(userToErase);
+			const response = createResponse<Partial<IUser>>(true, erased, null);
+			res.status(200).json(response);
+		} catch (err: any) {
+			const response: IAPIResponse<null> = createResponse(
+				false,
+				null,
+				"Internal server error."
+			);
+
+			if (
+				err instanceof ForbiddenAccessError ||
+				err instanceof NotFoundError
+			) {
+				response.error = err.message;
+				res.status(err.code).json(response);
+			} else {
+				res.status(500).json(response);
+			}
 		}
 	}
 }

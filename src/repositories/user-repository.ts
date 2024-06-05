@@ -34,15 +34,27 @@ export default class UserRepository {
 		return rows[0];
 	}
 
-	static async findUserByEmail(email: email): Promise<IUser | null> {
-		const query = 'SELECT * FROM "User" WHERE email = $1';
-		const { rows } = await dBConnection.query(query, [email]);
-		return rows[0] as IUser;
-	}
+    static async findUserByEmail(email: email):Promise<IUser | null> {
+        const query = 'SELECT * FROM "User" WHERE email = $1';
+        const { rows } = await dBConnection.query(query, [ email ]);
+        return rows[0] as IUser;
+    }
+    
+    static async findUserByID(userID: uuid):Promise<IUser | null> {
+        const query = 'SELECT * FROM "User" WHERE id = $1';
+        const { rows } = await dBConnection.query(query, [ userID ]);
+        return rows[0] as IUser;
+    }
 
-	static async findUserByID(userID: uuid): Promise<IUser | null> {
-		const query = 'SELECT * FROM "User" WHERE id = $1';
-		const { rows } = await dBConnection.query(query, [userID]);
-		return rows[0] as IUser;
-	}
+    static async deleteUser(userID:uuid):Promise<IUser>{
+        const query = 'DELETE FROM "User" WHERE id = $1 RETURNING * ';
+        const {rows} = await dBConnection.query(query, [userID]);
+        return rows[0] as IUser;
+    }
+
+    static async findBySquad(teamID:uuid):Promise<IUser>{
+        const query = 'SELECT * FROM "User" WHERE squad = $1';
+        const {rows} = await dBConnection.query(query, [teamID]);
+        return rows[0] as IUser;
+    }
 }
