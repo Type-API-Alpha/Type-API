@@ -2,6 +2,7 @@ import { ILoginTokenPayload, IUser, uuid } from "../interfaces/interfaces";
 import UserRepository from "../repositories/user-repository";
 import { ConflictError, ForbiddenAccessError, NotFoundError } from "../utils/err";
 import { createHashPassword } from "../utils/hash-password";
+import TeamService from "./team-service";
 
 export default class UserService {
     
@@ -101,5 +102,19 @@ export default class UserService {
                 throw new ConflictError('Service layer', 'Invalid Email.');
             }
         }
+    }
+
+    static async isLeader(userId: string): Promise<boolean> {
+        let isLeader = false;
+        const userInfos = await UserRepository.findUserByID(userId)
+        if(userInfos) {
+            const userSquad = userInfos.squad; 
+            const teamLeader = await TeamService.checkLeader(userSquad);
+            if(teamLeader.leader === userId) {
+                return isLeader = true;
+            }
+        }
+       
+        return isLeader;
     }
 }
