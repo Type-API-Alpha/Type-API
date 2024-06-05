@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { RequestBodyValidator } from "../utils/validations";
-import { validationFunction, IUser, ILoginTokenPayload } from "../interfaces/interfaces";
+import {
+	validationFunction,
+	IUser,
+	ILoginTokenPayload,
+} from "../interfaces/interfaces";
 import ValidationMiddleware from ".";
 import { ForbiddenAccessError } from "../utils/err";
 import createResponse from "../utils/response";
@@ -29,26 +33,37 @@ export default class UserMiddleware {
         await ValidationMiddleware.validateRequest(req, res, next, validationFunctions);
     }
 
-    static async validateAdminUser (req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            const loggedUser = req.user as ILoginTokenPayload;
-            const isAdmin = loggedUser.isAdmin === true;
-            
-            if (!isAdmin) {
-                throw new ForbiddenAccessError('Middlware layer', "Access denied: This resource is restricted to administrators only.");
-            }
+	static async validateAdminUser(
+		req: Request,
+		res: Response,
+		next: NextFunction
+	): Promise<void> {
+		try {
+			const loggedUser = req.user as ILoginTokenPayload;
+			const isAdmin = loggedUser.isAdmin === true;
 
-            next();
-        } catch (err) {
-            const response = createResponse<null>(false, null, 'Internal server error.');
+			if (!isAdmin) {
+				throw new ForbiddenAccessError(
+					"Middleware layer",
+					"Access denied: This resource is restricted to administrators only."
+				);
+			}
 
-            if (err instanceof ForbiddenAccessError) {
-                response.error = err.message;
-                res.status(err.code).json(response);
-                return;
-            } else {
-                res.status(500).json(response);
-            }
-        }
-    }
+			next();
+		} catch (err) {
+			const response = createResponse<null>(
+				false,
+				null,
+				"Internal server error."
+			);
+
+			if (err instanceof ForbiddenAccessError) {
+				response.error = err.message;
+				res.status(err.code).json(response);
+				return;
+			} else {
+				res.status(500).json(response);
+			}
+		}
+	}
 }

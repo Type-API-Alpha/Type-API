@@ -2,22 +2,31 @@ import dBConnection from "../database/db-connection";
 import { IUser, IUserDatabase, email, uuid } from "../interfaces/interfaces";
 
 export default class UserRepository {
-    
-    static async insertNewUser(userInfos: Partial<IUser>):Promise<IUser | void>{
-        const query = `
+	static async getAllUsers(): Promise<Partial<IUser[]>> {
+		const query = `SELECT id, username, email, first_name, last_name, squad, is_admin FROM "User";`;
+		const { rows } = await dBConnection.query(query);
+		return rows;
+	}
+
+	static async insertNewUser(
+		userInfos: Partial<IUser>
+	): Promise<IUser | void> {
+		const query = `
         INSERT INTO "User" 
         (username, email, first_name, last_name, password) 
         VALUES ($1, $2, $3, $4, $5) RETURNING *`;
 
-        const { rows } = await dBConnection.query(query, [... Object.values(userInfos)]);
-        return rows[0];
-    }
+		const { rows } = await dBConnection.query(query, [
+			...Object.values(userInfos),
+		]);
+		return rows[0];
+	}
 
-    static async findUserByUsername(username:string):Promise<IUser | null> {
-        const query = 'SELECT * FROM "User" WHERE username = $1';
-        const { rows } = await dBConnection.query(query, [ username ]);
-        return rows[0];
-    } 
+	static async findUserByUsername(username: string): Promise<IUser | null> {
+		const query = 'SELECT * FROM "User" WHERE username = $1';
+		const { rows } = await dBConnection.query(query, [username]);
+		return rows[0];
+	}
 
     static async findUserByEmail(email: email):Promise<IUser | null> {
         const query = 'SELECT * FROM "User" WHERE email = $1';
