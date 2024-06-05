@@ -49,7 +49,8 @@ export interface IAPIResponse<T> {
 
 export interface ILoginTokenPayload {
     userID: uuid,
-    isAdmin: boolean
+    isAdmin: boolean,
+    squad?: uuid | null
 }
 
 export interface ICookieOptions {

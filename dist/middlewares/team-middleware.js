@@ -52,6 +52,23 @@ class TeamMiddleware {
             yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID, teamID, true);
         });
     }
+    static validateAccessWithTeamMemberRestriction(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const loggedUser = req.user;
+            const teamID = req.params.team_id;
+            if (loggedUser.isAdmin) {
+                next();
+                return;
+            }
+            if (loggedUser.squad === teamID) {
+                console.log(loggedUser.squad);
+                next();
+                return;
+            }
+            console.log(loggedUser);
+            yield TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID);
+        });
+    }
     static validateAccessRestriction(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const loggedUser = req.user;

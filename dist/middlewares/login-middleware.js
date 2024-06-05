@@ -39,8 +39,8 @@ class LoginMiddleware {
                 if (!tokenDecoded) {
                     throw new err_1.UnauthorizedSessionError('Middleware layer(login)');
                 }
-                const { userID, isAdmin } = tokenDecoded;
-                req.user = { userID, isAdmin };
+                const { userID, isAdmin, squad } = tokenDecoded;
+                req.user = { userID, isAdmin, squad };
                 next();
             }
             catch (err) {

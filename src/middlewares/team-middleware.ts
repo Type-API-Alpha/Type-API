@@ -46,6 +46,23 @@ export default class TeamMiddleware {
         await TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID, teamID, true);
     }
 
+    static async validateAccessWithTeamMemberRestriction(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const loggedUser = req.user as ILoginTokenPayload;
+        const teamID = req.params.team_id;
+        
+        if(loggedUser.isAdmin) {
+            next(); 
+            return;
+        } 
+
+        if(loggedUser.squad === teamID) {
+            next();
+            return;
+        }
+        
+        await TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID);
+    }
+
     static async validateAccessRestriction(req: Request, res: Response, next: NextFunction): Promise<void> {
         const loggedUser = req.user as ILoginTokenPayload;
 
@@ -62,7 +79,6 @@ export default class TeamMiddleware {
         res: Response,
         next: NextFunction,
         loggedUserID: uuid, teamID?: uuid, restrictToOwnTeam?: boolean) {
-
             try {
                 const isLeader = await TeamRepository.getTeamByLeaderId(loggedUserID);
                 if(!isLeader) {
