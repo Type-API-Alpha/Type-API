@@ -37,11 +37,7 @@ class UserMiddleware {
                 const loggedUser = req.user;
                 const isAdmin = loggedUser.isAdmin === true;
                 if (!isAdmin) {
-<<<<<<< HEAD
                     throw new err_1.ForbiddenAccessError('Middleware layer');
-=======
-                    throw new err_1.ForbiddenAccessError('Middlware layer', "Access denied: This resource is restricted to administrators only.");
->>>>>>> origin/main
                 }
                 next();
             }
