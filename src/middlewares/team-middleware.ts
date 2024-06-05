@@ -5,6 +5,9 @@ import ValidationMiddleware from ".";
 import TeamRepository from "../repositories/team-repository";
 import { ForbiddenAccessError } from "../utils/err";
 import createResponse from "../utils/response";
+import UserRepository from "../repositories/user-repository";
+import TeamService from "../services/team-service";
+import UserService from "../services/user-service";
 
 export default class TeamMiddleware {
 
@@ -46,6 +49,52 @@ export default class TeamMiddleware {
         await TeamMiddleware.validateTeamLeader(req, res, next, loggedUser.userID, teamID, true);
     }
 
+    static async validateAccessWithTeamMember(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const loggedUser = req.user as ILoginTokenPayload;
+        const teamID = req.params.team_id;
+        
+        if(loggedUser.isAdmin) {
+            next(); 
+            return;
+        } 
+
+        const isLeader = await UserService.isLeader(loggedUser.userID);
+
+        if(isLeader) {
+            next();
+            return;
+        }
+
+        await TeamMiddleware.validateTeamMember(req, res, next, teamID);
+    }
+
+    static async validateTeamMember(
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        teamID: uuid) {
+
+            try {
+                const userSquad = await UserRepository.findBySquad(teamID);
+                console.log(userSquad);
+                
+                if(!userSquad) {
+                    throw new ForbiddenAccessError('Middleware layer', 'Access denied: This resource is restricted to administrators, team leaders or members of this team only.');
+                }
+
+                next();
+            } catch (err) {
+                const response: IAPIResponse<null> = createResponse(false, null, "Internal server error.");
+            
+                if(err instanceof ForbiddenAccessError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                } else {
+                    res.status(500).json(response);
+                }
+            }
+    }
+
     static async validateAccessRestriction(req: Request, res: Response, next: NextFunction): Promise<void> {
         const loggedUser = req.user as ILoginTokenPayload;
 
@@ -62,7 +111,6 @@ export default class TeamMiddleware {
         res: Response,
         next: NextFunction,
         loggedUserID: uuid, teamID?: uuid, restrictToOwnTeam?: boolean) {
-
             try {
                 const isLeader = await TeamRepository.getTeamByLeaderId(loggedUserID);
                 if(!isLeader) {
