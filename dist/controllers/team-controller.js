@@ -29,6 +29,26 @@ class TeamController {
             }
         });
     }
+    static createTeam(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const team = yield team_service_1.default.createTeam(req.body);
+                const response = (0, response_1.default)(true, team, null);
+                res.status(201).json(response);
+            }
+            catch (err) {
+                const response = (0, response_1.default)(false, null, 'Internal server error');
+                console.error(err);
+                if (err instanceof err_1.ConflictError || err instanceof err_1.NotFoundError) {
+                    response.error = err.message;
+                    res.status(err.code).json(response);
+                }
+                else {
+                    res.status(500).json(response);
+                }
+            }
+        });
+    }
     static addMember(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
