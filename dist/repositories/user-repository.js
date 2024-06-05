@@ -14,6 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_connection_1 = __importDefault(require("../database/db-connection"));
 class UserRepository {
+    static getAllUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = `SELECT id, username, email, first_name, last_name, squad, is_admin FROM "User";`;
+            const { rows } = yield db_connection_1.default.query(query);
+            return rows;
+        });
+    }
     static insertNewUser(userInfos) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = `
