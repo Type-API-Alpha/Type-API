@@ -47,7 +47,7 @@ class TeamService {
     }
     static createTeam(team) {
         return __awaiter(this, void 0, void 0, function* () {
-            const teamNameUsed = yield team_repository_1.default.findUserByName(team.name);
+            const teamNameUsed = yield team_repository_1.default.findTeamByName(team.name);
             if (teamNameUsed) {
                 throw new err_1.ConflictError("Service layer", "Team Name already used.");
             }
@@ -131,6 +131,42 @@ class TeamService {
             const erasedTeam = yield team_repository_1.default.deleteTeam(teamID);
             return erasedTeam;
         });
+    }
+    static updateTeam(loggedUser, teamInfos, teamID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const team = yield team_repository_1.default.findTeamByID(teamID);
+            if (!team) {
+                throw new err_1.NotFoundError('Service layer', 'Team');
+            }
+            const updatedTeam = Object.assign(Object.assign({}, team), teamInfos);
+            console.log(updatedTeam);
+            if (teamInfos.name) {
+                const teamNameUsed = yield team_repository_1.default.findTeamByName(updatedTeam.name);
+                if (teamNameUsed) {
+                    throw new err_1.ConflictError('Service layer', 'Team Name already used.');
+                }
+            }
+            // this.checkUserPermissions(loggedUser, team);
+            const userData = yield user_repository_1.default.findUserByID(updatedTeam.leader);
+            console.log(userData);
+            if (!userData) {
+                throw new err_1.NotFoundError('Service layer', 'User');
+            }
+            if (userData.squad !== updatedTeam.id) {
+                throw new err_1.ConflictError('Service layer', 'User is not part of the team');
+            }
+            if (userData.isAdmin) {
+                throw new err_1.ConflictError('Service layer', 'The admin cannot be a leader or be part of a group.');
+            }
+            const updatedTeamData = yield team_repository_1.default.updateTeam(updatedTeam);
+            return updatedTeamData;
+        });
+    }
+    static checkUserPermissions(loggedUser, teamToUpdate) {
+        console.log(loggedUser, teamToUpdate);
+        if (!loggedUser.isAdmin && loggedUser.userID !== teamToUpdate.leader) {
+            throw new err_1.ForbiddenAccessError('Service layer', 'Access denied: This resource is restricted to administrators or the leader team.');
+        }
     }
 }
 exports.default = TeamService;

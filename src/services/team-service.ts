@@ -1,8 +1,8 @@
 import TeamRepository from "../repositories/team-repository";
-import { ITeam, IUser, uuid } from "../interfaces/interfaces";
+import { ILoginTokenPayload, ITeam, IUser, uuid } from "../interfaces/interfaces";
 import UserRepository from "../repositories/user-repository";
 import teamRouter from "../routes/team-router";
-import { ConflictError, NotFoundError } from "../utils/err";
+import { ConflictError, NotFoundError, ForbiddenAccessError } from "../utils/err";
 
 export default class TeamService {
 
@@ -15,7 +15,7 @@ export default class TeamService {
     const team = await TeamRepository.getTeamById(teamId);
     return team;
   }
-
+  
   static async getMembersByTeamId(teamId: uuid): Promise<IUser[]> {
     const members = await UserRepository.findAllUsersBySquad(teamId);
     return members;
@@ -28,7 +28,7 @@ export default class TeamService {
     }
 
     const userData = await UserRepository.findUserByID(team.leader as string);
-    console.log(userData);
+
     if (!userData) {
       throw new NotFoundError("Service layer", "User");
     }
@@ -118,19 +118,59 @@ export default class TeamService {
     }
   }
 
-  static async deleteTeam(teamID: uuid): Promise<Partial<IUser>> {
-    const checkTeam: ITeam | null = await TeamRepository.findTeamByID(teamID);
-    if (!checkTeam) {
-      throw new NotFoundError("Service Layer", "Team");
+    static async deleteTeam(teamID: uuid): Promise<Partial<IUser>>{
+        const checkTeam:ITeam | null = await TeamRepository.findTeamByID(teamID);
+        if(!checkTeam){        
+            throw new NotFoundError('Service Layer', 'Team');
+        }
+        const emptyCheck:IUser | null = await UserRepository.findBySquad(teamID);
+        if(emptyCheck){
+            throw new ConflictError('Service Layer', 'The team cannot be deleted, since is not empty');
+        }
+        const erasedTeam = await TeamRepository.deleteTeam(teamID)
+        return erasedTeam;
+      }
+
+      static async updateTeam(loggedUser: ILoginTokenPayload, teamInfos: Partial<ITeam>, teamID: string): Promise<ITeam>{
+        const team = await TeamRepository.findTeamByID(teamID);
+        if(!team){
+          throw new NotFoundError('Service layer', 'Team');
+        }
+
+        const updatedTeam: ITeam = {
+          ...team,
+          ...teamInfos
+        }
+        console.log(updatedTeam);
+
+        if(teamInfos.name){
+          const teamNameUsed = await TeamRepository.findTeamByName(updatedTeam.name);
+          if(teamNameUsed){
+            throw new ConflictError('Service layer', 'Team Name already used.');
+          }
+        }
+
+        const userData = await UserRepository.findUserByID(updatedTeam.leader as string);
+        console.log(userData);
+        if(!userData){
+          throw new NotFoundError('Service layer', 'User');
+        }
+        if(userData.squad !== updatedTeam.id){
+          throw new ConflictError('Service layer', 'User is not part of the team');
+        }
+        if(userData.isAdmin){
+          throw new ConflictError('Service layer', 'The admin cannot be a leader or be part of a group.');
+        }
+
+        const updatedTeamData = await TeamRepository.updateTeam(updatedTeam);
+        return updatedTeamData;
+      }
+
+      private static checkUserPermissions(loggedUser: ILoginTokenPayload, teamToUpdate: ITeam):void {
+
+        console.log(loggedUser, teamToUpdate);
+        if (!loggedUser.isAdmin && loggedUser.userID !== teamToUpdate.leader) {
+            throw new ForbiddenAccessError('Service layer', 'Access denied: This resource is restricted to administrators or the leader team.');
+        }
     }
-    const emptyCheck: IUser | null = await UserRepository.findBySquad(teamID);
-    if (emptyCheck) {
-      throw new ConflictError(
-        "Service Layer",
-        "The team cannot be deleted, since is not empty"
-      );
-    }
-    const erasedTeam = await TeamRepository.deleteTeam(teamID);
-    return erasedTeam;
-  }
 }
