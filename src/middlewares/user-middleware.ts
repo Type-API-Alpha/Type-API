@@ -7,18 +7,25 @@ import createResponse from "../utils/response";
 
 export default class UserMiddleware {
 
-    static async validadeRequestBodyToCreateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-        const requestBodyValidator = new RequestBodyValidator();
+    static async validateRequestBodyUser(req: Request, res: Response, next: NextFunction): Promise<void> {
         const userInfos:IUser = req.body;
+        const validator = new RequestBodyValidator();
+        const validationFunctions: Array<validationFunction> = [];
 
-        const validationFunctions: Array<validationFunction> = [
-            () => requestBodyValidator.validateName('username', userInfos.username),
-            () => requestBodyValidator.validateName('firstName', userInfos.firstName),
-            () => requestBodyValidator.validateName('lastName', userInfos.lastName),
-            () => requestBodyValidator.validateUserEmail(userInfos.email),
-            () => requestBodyValidator.validateUserPassword(userInfos.password)
-        ];
-        
+        const usernameValidation = req.method === 'POST' || req.method === 'PATCH' && userInfos.username;
+        const firstNameValidation = req.method === 'POST' || req.method === 'PATCH' && userInfos.firstName;
+        const lastNameValidation = req.method === 'POST' || req.method === 'PATCH' && userInfos.lastName;
+        const emailValidation = req.method === 'POST' || req.method === 'PATCH' && userInfos.email;
+        const passwordValidation = req.method === 'POST' || req.method === 'PATCH' && userInfos.password;
+        const adminDataTypeValidation = req.method === 'PATCH' && userInfos.isAdmin;
+
+        usernameValidation ? validationFunctions.push(() => validator.validateName('username', userInfos.username)) : null;
+        firstNameValidation ? validationFunctions.push(() => validator.validateName('firstName', userInfos.firstName)) : null;
+        lastNameValidation ? validationFunctions.push(() => validator.validateName('lastName', userInfos.lastName)) : null;
+        emailValidation ? validationFunctions.push(() => validator.validateUserEmail(userInfos.email)) : null;
+        passwordValidation ? validationFunctions.push(() => validator.validateUserPassword(userInfos.password)) : null;
+        adminDataTypeValidation ? validationFunctions.push(() => validator.validateAdminType(userInfos.isAdmin)) : null;
+
         await ValidationMiddleware.validateRequest(req, res, next, validationFunctions);
     }
 
