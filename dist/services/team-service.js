@@ -33,26 +33,32 @@ class TeamService {
             return teams;
         });
     }
+    static getTeamById(teamId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const team = yield team_repository_1.default.getTeamById(teamId);
+            return team;
+        });
+    }
     static createTeam(team) {
         return __awaiter(this, void 0, void 0, function* () {
             const teamNameUsed = yield team_repository_1.default.findUserByName(team.name);
             if (teamNameUsed) {
-                throw new err_1.ConflictError('Service layer', 'Team Name already used.');
+                throw new err_1.ConflictError("Service layer", "Team Name already used.");
             }
             const userData = yield user_repository_1.default.findUserByID(team.leader);
             console.log(userData);
             if (!userData) {
-                throw new err_1.NotFoundError('Service layer', 'User');
+                throw new err_1.NotFoundError("Service layer", "User");
             }
             if (userData.squad != null) {
-                throw new err_1.ConflictError('Service layer', 'User is already on a team');
+                throw new err_1.ConflictError("Service layer", "User is already on a team");
             }
             if (userData.isAdmin) {
-                throw new err_1.ConflictError('Service layer', 'The admin cannot be a leader or be part of a group.');
+                throw new err_1.ConflictError("Service layer", "The admin cannot be a leader or be part of a group.");
             }
             const teamData = {
                 name: team.name,
-                leader: team.leader
+                leader: team.leader,
             };
             const teamReturn = yield team_repository_1.default.createTeam(teamData);
             yield team_repository_1.default.addNewMember(teamReturn.id, team.leader);
@@ -63,14 +69,14 @@ class TeamService {
         return __awaiter(this, void 0, void 0, function* () {
             const registeredUser = yield user_repository_1.default.findUserByID(userID);
             if (!registeredUser) {
-                throw new err_1.NotFoundError('Service layer', 'User');
+                throw new err_1.NotFoundError("Service layer", "User");
             }
             const registeredTeam = yield team_repository_1.default.findTeamByID(teamID);
             if (!registeredTeam) {
-                throw new err_1.NotFoundError('Service layer', 'Team');
+                throw new err_1.NotFoundError("Service layer", "Team");
             }
             if (registeredUser.squad) {
-                throw new err_1.ConflictError('Service layer', 'User cannot be added to the team: the user is already a member of another team.');
+                throw new err_1.ConflictError("Service layer", "User cannot be added to the team: the user is already a member of another team.");
             }
             const newMember = yield team_repository_1.default.addNewMember(teamID, userID);
             const { password } = newMember, newMemberWithoutPass = __rest(newMember, ["password"]);
@@ -81,7 +87,7 @@ class TeamService {
         return __awaiter(this, void 0, void 0, function* () {
             const checkTeamLeader = yield team_repository_1.default.findTeamByID(teamID);
             if (!checkTeamLeader) {
-                throw new err_1.NotFoundError('Service Layer', 'Team');
+                throw new err_1.NotFoundError("Service Layer", "Team");
             }
             return checkTeamLeader;
         });
@@ -90,14 +96,14 @@ class TeamService {
         return __awaiter(this, void 0, void 0, function* () {
             const checkTeam = yield team_repository_1.default.findTeamByID(teamID);
             if (!checkTeam) {
-                throw new err_1.NotFoundError('Service Layer', 'Team');
+                throw new err_1.NotFoundError("Service Layer", "Team");
             }
             const checkUser = yield user_repository_1.default.findUserByID(userID);
             if (!checkUser) {
-                throw new err_1.NotFoundError('Service Layer', 'User');
+                throw new err_1.NotFoundError("Service Layer", "User");
             }
             else if (checkUser.squad !== teamID) {
-                throw new err_1.ConflictError('Service layer', 'User does not belong to the selected Team');
+                throw new err_1.ConflictError("Service layer", "User does not belong to the selected Team");
             }
             else {
                 const deletedMember = yield team_repository_1.default.deleteMember(userID, teamID);
@@ -110,11 +116,11 @@ class TeamService {
         return __awaiter(this, void 0, void 0, function* () {
             const checkTeam = yield team_repository_1.default.findTeamByID(teamID);
             if (!checkTeam) {
-                throw new err_1.NotFoundError('Service Layer', 'Team');
+                throw new err_1.NotFoundError("Service Layer", "Team");
             }
             const emptyCheck = yield user_repository_1.default.findBySquad(teamID);
             if (emptyCheck) {
-                throw new err_1.ConflictError('Service Layer', 'The team cannot be deleted, since is not empty');
+                throw new err_1.ConflictError("Service Layer", "The team cannot be deleted, since is not empty");
             }
             const erasedTeam = yield team_repository_1.default.deleteTeam(teamID);
             return erasedTeam;

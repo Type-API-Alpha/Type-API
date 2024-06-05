@@ -19,6 +19,25 @@ export default class TeamController {
         }
     }
 
+    static async getTeamById(req: Request, res: Response): Promise<void> {
+        try {
+            const teamId = req.params.team_id;
+            const team = await TeamService.getTeamById(teamId);
+            const response: IAPIResponse<ITeam> = createResponse(true, team, null);
+            res.status(201).json(response);
+        } catch (err: any) {
+            const response: IAPIResponse<null> = createResponse(false, null, 'Internal server error');
+            console.error(err);
+
+            if(err instanceof ConflictError || err instanceof NotFoundError){
+            response.error = err.message;
+            res.status(err.code).json(response);
+            }else{
+            res.status(500).json(response);
+            }
+        }
+    }
+
     static async createTeam(req: Request, res: Response): Promise<void>{
       try {
         const team = await TeamService.createTeam(req.body);

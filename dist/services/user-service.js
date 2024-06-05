@@ -27,6 +27,7 @@ const team_repository_1 = __importDefault(require("../repositories/team-reposito
 const user_repository_1 = __importDefault(require("../repositories/user-repository"));
 const err_1 = require("../utils/err");
 const hash_password_1 = require("../utils/hash-password");
+const team_service_1 = __importDefault(require("./team-service"));
 class UserService {
     static createUser(userInfos) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -159,6 +160,20 @@ class UserService {
                     throw new err_1.ConflictError("Service layer", "Invalid Email.");
                 }
             }
+        });
+    }
+    static isLeader(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let isLeader = false;
+            const userInfos = yield user_repository_1.default.findUserByID(userId);
+            if (userInfos) {
+                const userSquad = userInfos.squad;
+                const teamLeader = yield team_service_1.default.checkLeader(userSquad);
+                if (teamLeader.leader === userId) {
+                    return isLeader = true;
+                }
+            }
+            return isLeader;
         });
     }
 }

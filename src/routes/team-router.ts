@@ -7,6 +7,7 @@ import UserMiddleware from "../middlewares/user-middleware";
 const teamRouter: Router = Router();
 
 teamRouter.get('/teams', TeamMiddleware.validateAccessRestriction, TeamController.getAllTeams);
+teamRouter.get('/teams/:team_id', TeamMiddleware.validateAccessWithTeamMember, TeamController.getTeamById);
 teamRouter.post('/teams', UserMiddleware.validateAdminUser, TeamMiddleware.validadeRequestBodyToCreateTeam, TeamController.createTeam);
 teamRouter.post('/teams/:team_id/member/:user_id', 
     TeamMiddleware.validateIDTypeToAddNewMembers,
