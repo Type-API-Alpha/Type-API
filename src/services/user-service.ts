@@ -1,6 +1,6 @@
-import { IUser, uuid } from "../interfaces/interfaces";
+import { ILoginTokenPayload, IUser, uuid } from "../interfaces/interfaces";
 import UserRepository from "../repositories/user-repository";
-import { ConflictError, NotFoundError } from "../utils/err";
+import { ConflictError, ForbiddenAccessError, NotFoundError } from "../utils/err";
 import { createHashPassword } from "../utils/hash-password";
 
 export default class UserService {
@@ -66,5 +66,62 @@ export default class UserService {
         const erasedUser:IUser = await UserRepository.deleteUser(userToErase)  
         const {password, ... entityerased} = erasedUser;
         return entityerased;
+    }
+
+    static async updateUserInfos(loggedUser: ILoginTokenPayload, paramsUserID: string, newUserData: Partial<IUser>) {
+        const userToUpdate = await this.findUserByID(paramsUserID);
+
+        this.checkUserPermissions(loggedUser, userToUpdate, newUserData);
+
+        await this.validateNewUserData(newUserData);
+
+        if (newUserData.password) {
+            newUserData.password = await createHashPassword(newUserData.password);
+        }
+
+        const { password, ...updatedUser } = await UserRepository.updateUser(newUserData, paramsUserID);
+        return updatedUser;
+    }
+
+    private static async findUserByID(userID: string): Promise<IUser> {
+        const user = await UserRepository.findUserByID(userID);
+        if (!user) {
+            throw new NotFoundError('Service layer', 'User');
+        }
+        return user;
+    }
+
+    private static checkUserPermissions(loggedUser: ILoginTokenPayload, userToUpdate: IUser, newUserData: Partial<IUser>):void {
+
+        if (loggedUser.userID !== userToUpdate.id && !loggedUser.isAdmin) {
+            throw new ForbiddenAccessError('Service layer', 'Access denied: This resource is restricted to administrators or the own user.');
+        }
+
+        if (newUserData.isAdmin) {
+            if (!loggedUser.isAdmin) {
+                throw new ForbiddenAccessError('Service layer', 'Access denied: This resource is restricted to administrators only.');
+            }
+
+            if (userToUpdate.squad) {
+                throw new ConflictError('Service layer', 'Failed to promote user to admin: Administrators cannot be assigned to any team.');
+            }
+        }
+    }
+
+    private static async validateNewUserData(newUserData: Partial<IUser>):Promise<void> {
+
+        if (newUserData.username) {
+            const usernameUsed = await UserRepository.findUserByUsername(newUserData.username);
+            if (usernameUsed) {
+                throw new ConflictError('Service layer', 'Username already used.');
+            }
+        }
+
+        if (newUserData.email) {
+            const registeredEmail = await UserRepository.findUserByEmail(newUserData.email);
+            if (registeredEmail) {
+                throw new ConflictError('Service layer', 'Invalid Email.');
+            }
+        }
     }
 }

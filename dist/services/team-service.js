@@ -33,6 +33,32 @@ class TeamService {
             return teams;
         });
     }
+    static createTeam(team) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const teamNameUsed = yield team_repository_1.default.findUserByName(team.name);
+            if (teamNameUsed) {
+                throw new err_1.ConflictError('Service layer', 'Team Name already used.');
+            }
+            const userData = yield user_repository_1.default.findUserByID(team.leader);
+            console.log(userData);
+            if (!userData) {
+                throw new err_1.NotFoundError('Service layer', 'User');
+            }
+            if (userData.squad != null) {
+                throw new err_1.ConflictError('Service layer', 'User is already on a team');
+            }
+            if (userData.isAdmin) {
+                throw new err_1.ConflictError('Service layer', 'The admin cannot be a leader or be part of a group.');
+            }
+            const teamData = {
+                name: team.name,
+                leader: team.leader
+            };
+            const teamReturn = yield team_repository_1.default.createTeam(teamData);
+            yield team_repository_1.default.addNewMember(teamReturn.id, team.leader);
+            return teamReturn;
+        });
+    }
     static addNewMember(teamID, userID) {
         return __awaiter(this, void 0, void 0, function* () {
             const registeredUser = yield user_repository_1.default.findUserByID(userID);

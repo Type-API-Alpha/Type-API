@@ -11,6 +11,36 @@ export default class TeamService {
         return teams;
     }
 
+  static async createTeam(team: ITeam): Promise<Partial<ITeam>>{
+    const teamNameUsed = await TeamRepository.findUserByName(team.name);
+    if(teamNameUsed){
+      throw new ConflictError('Service layer', 'Team Name already used.');
+    }
+
+    const userData = await UserRepository.findUserByID(team.leader as string);
+    console.log(userData);
+    if(!userData){
+      throw new NotFoundError('Service layer', 'User');
+    }
+    if(userData.squad != null){
+      throw new ConflictError('Service layer', 'User is already on a team');
+    }
+    if(userData.isAdmin){
+      throw new ConflictError('Service layer', 'The admin cannot be a leader or be part of a group.');
+    }
+
+    const teamData:Partial<ITeam> = {
+      name: team.name,
+      leader: team.leader
+    }
+
+    const teamReturn = await TeamRepository.createTeam(teamData);
+
+    await TeamRepository.addNewMember(teamReturn.id, team.leader);
+
+    return teamReturn;
+  }
+
     static async addNewMember(teamID: uuid, userID: uuid):Promise<Partial<IUser>> {
 
         const registeredUser:IUser | null = await UserRepository.findUserByID(userID);

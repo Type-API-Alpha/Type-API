@@ -62,5 +62,55 @@ class UserService {
             return user;
         });
     }
+    static updateUserInfos(loggedUser, paramsUserID, newUserData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userToUpdate = yield this.findUserByID(paramsUserID);
+            this.checkUserPermissions(loggedUser, userToUpdate, newUserData);
+            yield this.validateNewUserData(newUserData);
+            if (newUserData.password) {
+                newUserData.password = yield (0, hash_password_1.createHashPassword)(newUserData.password);
+            }
+            const _a = yield user_repository_1.default.updateUser(newUserData, paramsUserID), { password } = _a, updatedUser = __rest(_a, ["password"]);
+            return updatedUser;
+        });
+    }
+    static findUserByID(userID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_repository_1.default.findUserByID(userID);
+            if (!user) {
+                throw new err_1.NotFoundError('Service layer', 'User');
+            }
+            return user;
+        });
+    }
+    static checkUserPermissions(loggedUser, userToUpdate, newUserData) {
+        if (loggedUser.userID !== userToUpdate.id && !loggedUser.isAdmin) {
+            throw new err_1.ForbiddenAccessError('Service layer', 'Access denied: This resource is restricted to administrators or the own user.');
+        }
+        if (newUserData.isAdmin) {
+            if (!loggedUser.isAdmin) {
+                throw new err_1.ForbiddenAccessError('Service layer', 'Access denied: This resource is restricted to administrators only.');
+            }
+            if (userToUpdate.squad) {
+                throw new err_1.ConflictError('Service layer', 'Failed to promote user to admin: Administrators cannot be assigned to any team.');
+            }
+        }
+    }
+    static validateNewUserData(newUserData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (newUserData.username) {
+                const usernameUsed = yield user_repository_1.default.findUserByUsername(newUserData.username);
+                if (usernameUsed) {
+                    throw new err_1.ConflictError('Service layer', 'Username already used.');
+                }
+            }
+            if (newUserData.email) {
+                const registeredEmail = yield user_repository_1.default.findUserByEmail(newUserData.email);
+                if (registeredEmail) {
+                    throw new err_1.ConflictError('Service layer', 'Invalid Email.');
+                }
+            }
+        });
+    }
 }
 exports.default = UserService;

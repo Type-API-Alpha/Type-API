@@ -5,7 +5,7 @@ import {
 	ForbiddenAccessError,
 	NotFoundError,
 } from "../utils/err";
-import { IAPIResponse, IUser } from "../interfaces/interfaces";
+import { IAPIResponse, ILoginTokenPayload, IUser, uuid } from "../interfaces/interfaces";
 import UserService from "../services/user-service";
 import createResponse from "../utils/response";
 import { validate as uuidValidate } from "uuid";
@@ -57,7 +57,6 @@ export default class UserController {
 		try {
 			const userID = req.user?.userID;
 			if (!userID) throw new Error("user do not have userID");
-
 			const isUUID = uuidValidate(userID);
 			if (!isUUID) throw new Error("uuid is not valid.");
 
@@ -140,4 +139,25 @@ export default class UserController {
 			}
 		}
 	}
+
+    static async updateUser(req: Request, res: Response): Promise<void> {
+        try {
+            const loggedUser = req.user as ILoginTokenPayload;
+            const userIDToUpdate:uuid = req.params.user_id;
+            const newUserInfos = req.body;
+
+            const updatedUser = await UserService.updateUserInfos(loggedUser, userIDToUpdate, newUserInfos);
+            const response = createResponse<Partial<IUser>>(true, updatedUser, null);
+            res.status(200).json(response);
+        } catch (err) {
+            const response = createResponse<null>(false, null, 'Internal server error.');
+            
+            if (err instanceof ConflictError || err instanceof ForbiddenAccessError || err instanceof NotFoundError) {
+                response.error = err.message;
+                res.status(err.code).json(response);
+            } else {
+                res.status(500).json(response);
+            }
+        }
+    }
 }
