@@ -40,7 +40,7 @@ class UserRepository {
     }
     static findUserByID(userID) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = 'SELECT * FROM "User" WHERE id = $1';
+            const query = 'SELECT id, username, email, first_name as "firstName", last_name as "lastName", squad, is_admin as "isAdmin" FROM "User" WHERE id = $1';
             const { rows } = yield db_connection_1.default.query(query, [userID]);
             return rows[0];
         });
@@ -56,6 +56,28 @@ class UserRepository {
         return __awaiter(this, void 0, void 0, function* () {
             const query = 'SELECT * FROM "User" WHERE squad = $1';
             const { rows } = yield db_connection_1.default.query(query, [teamID]);
+            return rows[0];
+        });
+    }
+    static updateUser(userInfos, userID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const userData = {};
+            userInfos.username ? userData['username'] = userInfos.username : null;
+            userInfos.firstName ? userData['first_name'] = userInfos.firstName : null;
+            userInfos.lastName ? userData['last_name'] = userInfos.lastName : null;
+            userInfos.email ? userData['email'] = userInfos.email : null;
+            userInfos.password ? userData['password'] = userInfos.password : null;
+            userInfos.isAdmin ? userData['is_admin'] = userInfos.isAdmin : null;
+            const userPropertyList = Object.keys(userData);
+            const newValues = Object.values(userData);
+            newValues.push(userID);
+            let query = `UPDATE "User" SET `;
+            for (let i = 0; i < userPropertyList.length; i++) {
+                const property = ` ${userPropertyList[i]} = $${i + 1},`;
+                query += property;
+            }
+            const formattedQuery = query.slice(0, -1) + ` WHERE id = $${userPropertyList.length + 1} RETURNING *;`;
+            const { rows } = yield db_connection_1.default.query(formattedQuery, newValues);
             return rows[0];
         });
     }
