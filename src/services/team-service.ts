@@ -16,6 +16,11 @@ export default class TeamService {
     return team;
   }
 
+  static async getMembersByTeamId(teamId: uuid): Promise<IUser[]> {
+    const members = await UserRepository.findAllUsersBySquad(teamId);
+    return members;
+  }
+  
   static async createTeam(team: ITeam): Promise<Partial<ITeam>> {
     const teamNameUsed = await TeamRepository.findUserByName(team.name);
     if (teamNameUsed) {

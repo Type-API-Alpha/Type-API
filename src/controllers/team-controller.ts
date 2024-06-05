@@ -4,6 +4,7 @@ import TeamService from "../services/team-service";
 import createResponse from "../utils/response";
 import { IUser } from "../interfaces/interfaces";
 import { ConflictError, ForbiddenAccessError, NotFoundError } from "../utils/err";
+import UserService from "../services/user-service";
 
 export default class TeamController {
 
@@ -33,6 +34,26 @@ export default class TeamController {
             response.error = err.message;
             res.status(err.code).json(response);
             }else{
+            res.status(500).json(response);
+            }
+        }
+    }
+
+    static async getMembersByTeamId(req: Request, res: Response): Promise<void> {
+        try {
+            const teamId = req.params.team_id;
+            const members = await TeamService.getMembersByTeamId(teamId);
+            const response: IAPIResponse<IUser[]> = createResponse(true, members, null);
+            res.status(201).json(response);
+
+        } catch (err: any) {
+
+            const response: IAPIResponse<null> = createResponse(false, null, 'Internal server error');
+            if(err instanceof ConflictError || err instanceof NotFoundError){
+            response.error = err.message;
+            res.status(err.code).json(response);
+
+            } else {
             res.status(500).json(response);
             }
         }

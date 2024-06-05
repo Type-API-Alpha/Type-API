@@ -33,7 +33,8 @@ class LoginService {
     static createSessionCookie(authenticatedUser) {
         const payload = {
             userID: authenticatedUser.id,
-            isAdmin: authenticatedUser.is_admin
+            isAdmin: authenticatedUser.is_admin,
+            squad: authenticatedUser.squad
         };
         const tokenOption = { expiresIn: '8h' };
         const sessionToken = (0, token_1.createToken)(payload, tokenOption);

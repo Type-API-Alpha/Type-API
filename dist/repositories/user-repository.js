@@ -20,7 +20,9 @@ class UserRepository {
         INSERT INTO "User" 
         (username, email, first_name, last_name, password) 
         VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-            const { rows } = yield db_connection_1.default.query(query, [...Object.values(userInfos)]);
+            const { rows } = yield db_connection_1.default.query(query, [
+                ...Object.values(userInfos),
+            ]);
             return rows[0];
         });
     }
@@ -59,15 +61,22 @@ class UserRepository {
             return rows[0];
         });
     }
+    static findAllUsersBySquad(team_id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = 'SELECT * FROM "User" WHERE squad = $1';
+            const { rows } = yield db_connection_1.default.query(query, [team_id]);
+            return rows;
+        });
+    }
     static updateUser(userInfos, userID) {
         return __awaiter(this, void 0, void 0, function* () {
             const userData = {};
-            userInfos.username ? userData['username'] = userInfos.username : null;
-            userInfos.firstName ? userData['first_name'] = userInfos.firstName : null;
-            userInfos.lastName ? userData['last_name'] = userInfos.lastName : null;
-            userInfos.email ? userData['email'] = userInfos.email : null;
-            userInfos.password ? userData['password'] = userInfos.password : null;
-            userInfos.isAdmin ? userData['is_admin'] = userInfos.isAdmin : null;
+            userInfos.username ? (userData["username"] = userInfos.username) : null;
+            userInfos.firstName ? (userData["first_name"] = userInfos.firstName) : null;
+            userInfos.lastName ? (userData["last_name"] = userInfos.lastName) : null;
+            userInfos.email ? (userData["email"] = userInfos.email) : null;
+            userInfos.password ? (userData["password"] = userInfos.password) : null;
+            userInfos.isAdmin ? (userData["is_admin"] = userInfos.isAdmin) : null;
             const userPropertyList = Object.keys(userData);
             const newValues = Object.values(userData);
             newValues.push(userID);
@@ -76,7 +85,8 @@ class UserRepository {
                 const property = ` ${userPropertyList[i]} = $${i + 1},`;
                 query += property;
             }
-            const formattedQuery = query.slice(0, -1) + ` WHERE id = $${userPropertyList.length + 1} RETURNING *;`;
+            const formattedQuery = query.slice(0, -1) +
+                ` WHERE id = $${userPropertyList.length + 1} RETURNING *;`;
             const { rows } = yield db_connection_1.default.query(formattedQuery, newValues);
             return rows[0];
         });
